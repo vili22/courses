@@ -1,0 +1,62 @@
+\documentclass[12pt]{article}
+\usepackage{fp2010}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{hyperref}
+
+%%% Remove the following line if Times font is unavailable.
+\usepackage{times}
+
+%%% The following line is required if the document contains figures.
+\usepackage{graphicx}
+
+%%% The following line is for LaTeX 2.09.
+%\documentstyle[FP2001,12pt]{article}
+
+\begin{document}
+
+%%%
+%%% The title of the abstract is given here as \title{TITLE TEXT}.
+%%%
+\title{Mat-1.3626 excercise 7 Ville Virkkala 63325V}
+
+\vspace{\baselineskip}
+
+\textbf{4.a)} For single detector posterior density $\pi _{post}(\mathbf{x})$ is given by
+\begin{eqnarray}
+   \pi_{post}(\mathbf{x})_j &=& \pi (\mathbf{x}|v_j) \nonumber \\
+  &=& \pi_{pr}(\mathbf{x})\pi(v_j|\mathbf{x}),
+\end{eqnarray}
+where $\pi(v_j|\mathbf{x})=\pi_{noise}(v_j-f_j(\mathbf{x}))$ and $\pi_{pr}$  is the characteristic function of unit circle.
+Now for the whole system posterior density is the product of the single detector posterior densities
+\begin{equation}
+  \pi_{post}(\mathbf{x})=\pi_{pr}(\mathbf{x})\Pi_{j=1}^N\pi_{noise}(v_j-f_j(\mathbf{x})).
+\end{equation}  
+
+\textbf{4.b)} In this case the conditional probability $\pi(x,q|v_j)$ in the case of single detector can be written as
+\begin{equation}
+  \pi(x,q|v_j)=\pi_{pr}(q)\pi_{noise}(v_j-\frac{q}{d_j}),
+\end{equation}
+where $d_j=\sqrt{(x_1-p_{x,j})^2+(x_2-p_{y,j})^2}$. Writing these distributions open gives
+\begin{equation}
+  \pi(\mathbf{x},q|v_j)=e^{-\frac{1}{2\sigma_n^2}v_j^2-\frac{1}{2\sigma_q^2}q_0^2}e^{-q^2(\frac{1}{2\sigma_q^2}+\frac{1}{2\sigma_n^2d_j^2})+q(\frac{q_0}{\sigma_q^2}+\frac{v_j}{\sigma_n^2d_j})}.
+\end{equation}
+Now for the whole system probability is again the product of the single probability densities
+\begin{equation}
+\pi(\mathbf{x},q|v)=e^{-\frac{1}{2\sigma_n^2}\sum_jv_j^2-\frac{N}{2\sigma_q^2}q_0^2}e^{-q^2(\frac{1}{2\sigma_q^2}+\frac{1}{2\sigma_n^2}\sum_j\frac{1}{d_j^2})+q(\frac{q_0}{\sigma_q^2}+\frac{1}{\sigma_n^2}\sum_j\frac{v_j}{d_j})}.
+\end{equation}
+By substituting $a=\frac{1}{2\sigma_q^2}+\frac{1}{2\sigma_n^2}\sum_j\frac{1}{d_j^2}$ and $b=\frac{q_0}{\sigma_q^2}+\frac{1}{\sigma_n^2}\sum_j\frac{v_j}{d_j}$ gives
+\begin{equation}
+  \pi(\mathbf{x},q|v)=Ce^{-\frac{1}{2\sigma_n^2}\sum_jv_j^2+\frac{b^2}{4a}}e^{-(\sqrt{a}q-\frac{b}{2\sqrt{a}})^2},
+\end{equation}
+and by setting $z=\sqrt{a}q-\frac{b}{2\sqrt{a}}$ gives for the marginal density $\pi(\mathbf{x}|v)$
+\begin{eqnarray}
+  \pi(\mathbf{x}|v) &=&\int\limits_{-\infty}^{\infty}\pi(\mathbf{x},q|v)dq \nonumber\\
+  &=&C\frac{e^{-\frac{1}{2\sigma_n^2}\sum_jv_j^2+\frac{b^2}{4a}}}{\sqrt{a}}
+\end{eqnarray} 
+
+
+
+
+
+\end{document}
