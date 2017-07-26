@@ -1,51 +1,59 @@
 import numpy as np
+import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 
 def read_data(filename):
     with open(filename) as f:
-        array2d = [[float(digit) for digit in line.split()] for line in f]
+        array2d = [[float(digit) for digit in line.split(',')] for line in f]
         return np.array(array2d)
 
-train_data = read_data('/home/vvirkkal/Documents/kurssit/machine_learning_basic_principles/ex2/ex2_data/ex2_traindata.txt')
-test_data = read_data('/home/vvirkkal/Documents/kurssit/machine_learning_basic_principles/ex2/ex2_data/ex2_testdata.txt')
+data = read_data('/home/vvirkkal/Documents/kurssit/machine_learning_basic_principles/ex4/pima_indians_diabetes.csv')
+plasma_clucose = data[:, 2]
+true_class = data[:, 8]
 
-train_data = train_data[train_data[:,0].argsort()]
-x_train = train_data[:, 0]
-y_train = train_data[:, 1]
+train_data_sizes = [100, 200, 500]
 
-x_validation = x_train[1::3]
-y_validation = y_train[1::3]
+for train_data_size in train_data_sizes:
 
-x_train = np.delete(x_train, np.arange(1, x_train.size, 3))
-y_train = np.delete(y_train, np.arange(1, y_train.size, 3))
-print [train_data.size, x_train.size, x_validation.size]
+    train_x = plasma_clucose[0:train_data_size]
+    train_class = true_class[0:train_data_size]
 
-test_data = test_data[test_data[:, 1].argsort()]
-x_test = test_data[:, 0]
-y_test = test_data[:, 1]
+    validation_x = plasma_clucose[train_data_size:(plasma_clucose.size - 1)]
+    validation_class = true_class[train_data_size:(true_class.size - 1)]
 
-min_val = float('inf');
-min_ind = 1;
+    positive_indices = np.where(train_class == 1)
+    negative_indices = np.where(train_class == 0)
 
-for k in range(1,30):
-    phi = np.vander(x_train, k +1 , increasing=True)
-    w = np.dot(np.linalg.pinv(phi), y_train)
-    y_interp = np.dot(np.vander(x_validation, k+1, increasing=True), w)
+    positive_train_x = train_x[positive_indices].astype(float)
+    negative_train_x = train_x[negative_indices].astype(float)
 
-    norm = np.linalg.norm(y_validation - y_interp)**2
-    print [k +1 , norm]
-    if norm < min_val:
-        min_ind = k
-        min_val = norm
+    N1 = float(positive_train_x.size)
+    N2 = float(negative_train_x.size)
+    p1 = N1/(N1 + N2)
+    p2 = N2/(N1 + N2)
 
-print [min_ind, min_val]
-phi = np.vander(x_train, min_ind + 1, increasing=True)
-w = np.dot(np.linalg.pinv(phi), y_train)
-y_interp = np.dot(np.vander(x_test, min_ind + 1, increasing=True), w)
+    mu1 = float(np.sum(positive_train_x))/N1
+    mu2 = float(np.sum(negative_train_x))/N2
 
-plt.plot(x_test, y_test, '.b')
-plt.plot(x_test, y_interp, '.r')
-plt.show()
+    sigma1 = np.sqrt(np.sum(np.power(positive_train_x - mu1, 2))/N1)
+    sigma2 = np.sqrt(np.sum(np.power(negative_train_x - mu2, 2))/N2)
+
+    posterior_positive = 1/np.sqrt(2 * np.pi)/sigma1*np.exp(-np.power(validation_x - mu1, 2) / 2 / (sigma1**2)) * p1
+    posterior_negative = 1 / np.sqrt(2 * np.pi) / sigma2 * np.exp(-np.power(validation_x - mu2, 2) / 2 / (sigma2 ** 2)) * p2
+
+    positive_classification = np.where((posterior_positive - posterior_negative) >= 0)
+    negative_classification = np.where((posterior_positive - posterior_negative) < 0)
+
+    true_positives = np.where(validation_class[positive_classification] == 1)[0].size
+    true_negatives = np.where(validation_class[negative_classification] == 0)[0].size
+
+    accuracy = (float(true_positives) + float(true_negatives))/float(validation_class.size)
+    print true_positives, true_negatives, validation_class.size, 'accuracy is ' + str(accuracy)
+    print [p1, mu1, sigma1, p2, mu2, sigma2]
+    n, bins, patches = plt.hist(negative_train_x, 25, normed=1, facecolor='green', alpha=0.75)
+    y = mlab.normpdf(bins, mu1, sigma1)
+    plt.plot(bins, y, 'r--', linewidth=1)
+    plt.show()
 
 
