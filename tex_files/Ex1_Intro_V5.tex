@@ -1,0 +1,163 @@
+
+\documentclass[article,11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{bm, amssymb}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\renewcommand*{\thesection}{Problem~\arabic{section}:}
+\renewcommand{\labelenumi}{(\alph{enumi})}
+\input{mlbp17_macros}
+
+\title{CS-E3210- Machine Learning Basic Principles \\ Home Assignment 1 - ``Introduction''}
+\begin{document}
+\date{}
+\maketitle
+
+Your solutions to the following problems should be submitted as one single pdf which does not contain 
+any personal information (student ID or name). The only rule for the layout of your submission is that 
+each problem has to correspond to one single page, which has to include the problem statement on top 
+and your solution below. You are welcome to use the \LaTeX-file underlying this pdf, 
+available under \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public}, and fill in your solutions there. 
+
+\newpage
+
+\section{Let The Data Speak - I}
+In the folder ``Webcam'' at \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public} you will find $\samplesize=7$  
+webcam snapshots $\vz^{(1)},\ldots,\vz^{(\samplesize)}$ with filename ``shot??.jpg''. Import these snapshots into your favourite 
+programming environment (Matlab, Python, etc.) and determine for each snapshot $\vz^{(\sampleidx)}$ its greenness $x_{g}^{(\sampleidx)}$ 
+and redness $x_{r}^{(\sampleidx)}$ by summing the green and red intensities over all image pixels (cf.\ \url{https://en.wikipedia.org/wiki/RGB_color_model}). 
+Produce a scatter plot (cf.\ \url{https://en.wikipedia.org/wiki/Scatter_plot}) with the points $\vx^{(\sampleidx)}=(x^{(\sampleidx)}_{r},x^{(\sampleidx)}_{g})^{T} \in \mathbb{R}^{2}$, for $i=1,\ldots,\samplesize$. 
+Do not forget to label the axes of your plot. 
+%wher
+%with $x$-axis representing the redness and $y$-axis representing the greenness. 
+
+\noindent{\bf Answer.}
+\\The images are rode using SciPy and for each image the sum of every channel is calculated. The scatter plot sum of red channel intensities versus the green channel intensities are shown in figure \ref{fig:scatter_plot1} . According to figure \ref{fig:scatter_plot1} the red and green channels are clearly positively correlated.
+\begin{figure}[!b]
+  \centering
+  \includegraphics[width=0.6\linewidth]{ex1_1.eps}
+  %\epsfig{file=ex1_1.eps,width=0.6\linewidth,clip=}
+  %\includegraphics[width=0.6\linewidth]{./figures/GaAsN2}
+  \caption{Scatter plot of sum of red channel intensities vs sum of green channel intensities.}
+  \label{fig:scatter_plot1}
+\end{figure}
+
+\newpage
+\section{Let The Data Speak - II}
+Familiarize yourself with random number generation in your favourite 
+programming environment (Matlab, Python, etc.). In particular, try to generate a data set 
+$\{ \vz^{(\sampleidx)} \}_{i=1}^{\samplesize}$ containing $\samplesize=100$ vectors $\vz^{(\sampleidx)} \in \mathbb{R}^{10}$, which 
+are drawn from (i.i.d. realizations of) a Gaussian distribution $\mathcal{N}(\mathbf{0},\mathbf{I})$ with zero mean and covariance 
+matrix being the identity matrix $\mathbf{I}$. For each data point $\vz^{(\sampleidx)}$, compute the two 
+features 
+\begin{equation}
+x_{1}^{(\sampleidx)} = \mathbf{u}^{T} \vz^{(\sampleidx)} \mbox{, and } x_{2}^{(\sampleidx)}= \mathbf{v}^{T} \vz^{(\sampleidx)}, 
+\end{equation}
+with the vectors $\mathbf{u}\!=\!(1,0,\ldots,0)^{T}\in \mathbb{R}^{10}$ and $\mathbf{v}\!=\!(9/10,1/10,0,\ldots,0)^{T}\in \mathbb{R}^{10}$. 
+Produce a scatter plot (cf.\ \url{https://en.wikipedia.org/wiki/Scatter_plot}) with the points 
+$\vx^{(\sampleidx)}=(x^{(\sampleidx)}_{1},x^{(\sampleidx)}_{2})^{T} \in \mathbb{R}^{2}$, for $\sampleidx=1,\ldots,\samplesize$. 
+Do not forget to label the axes of your plot. 
+
+
+\noindent{\bf Answer.}
+\\Because the covariance-matrix is diagonal the random vectors can be directly sampled from the one-dimensional gaussian with variance
+$\sigma^2 = \frac{1}{2}$ . One hundread random vectors of length 10 are generated and for each vector $\mathbf{z}^{(i)}$ scalars $x_1^{(i)} = u^{T}z^{(i)}$ and
+$x_2^{(i)} = v^{T}z^{(i)}$ are generated and stored. The resulting scatter plot
+$x_1^{(i)}$ vs  $x_2^{(i)}$ is shown in figure \ref{fig:scatter_plot2} . Again theres is a clear positive correlation between variables $x_1^{(i)} = u^{T}z^{(i)}$
+and $x_2^{(i)} = v^{T}z^{(i)}$
+\begin{figure}[!b]
+  \centering
+  \includegraphics[width=0.6\linewidth]{ex1_2.eps}
+  %\epsfig{file=ex1_1.eps,width=0.6\linewidth,clip=}
+  %\includegraphics[width=0.6\linewidth]{./figures/GaAsN2}
+  \caption{Scatter plot of $x_1^{(i)}$ vs  $x_2^{(i)}$.}
+  \label{fig:scatter_plot2}
+\end{figure}
+
+
+\newpage
+
+
+\section{Statistician's Viewpoint}
+
+Consider you are provided a spreadsheet whose rows contain the data points $\vz^{(\sampleidx)}=(\sampleidx,y^{(\sampleidx)})$, with row index $\sampleidx=1,\ldots,\samplesize$.  
+A statistician might be interested in studying how to model the data using a probabilistic model, e.g., 
+\begin{equation} 
+y^{(\sampleidx)} = \mu + \sigma e^{(\sampleidx)} 
+\end{equation}
+where $e^{(\sampleidx)}$ are i.i.d. standard normal random variables, i.e., $e^{(\sampleidx)} \sim \mathcal{N}(0,1)$.
+\begin{itemize}
+\item Which choice for $\mu$ best fits the observed data?
+\item Given the optimum choice for $\mu$, what would be the best guess for $y^{(\samplesize+1)}$?
+\item Can we somehow quantify the uncertainty in this prediction?
+\end{itemize}
+\noindent {\bf Answer.}
+\\If $e^{(i)}$ is a normally distributed random variable $e^{(i)} \sim \mathcal{N}(0,1)$ then $y = \mu + \sigma e^{(i)}$ is also a normally distributed random variable $y \sim \mathcal{N}(\mu,\sigma)$ .\\
+\noindent{\bf (a)} The optimal $\mu$ can be found by maximizing the log-likelihood $\mathcal{L}(\{\mu, \sigma\}, \mathbf{x})$ (assuming independent data points)
+\begin{eqnarray}
+  \mathrm{log}\mathcal{L}(\mu, \sigma | \mathbf{x})&=& \mathrm{log}\prod_i^NP(x_i|\mu,\sigma)\nonumber\\
+  &=& \sum_i^N\mathrm{log}P(x_i|\mu,\sigma)\\
+  &=& \sum_i^N\left(-\frac{1}{2}\mathrm{log}(2\pi\sigma)-\frac{(x_i - \mu)^2}{2\sigma^2}\right).
+\label{eq:max-likelihood1}
+\end{eqnarray}
+The value of $\mu$ that maximizes the log-likelihood is obtained by setting the derivative with respect to $\mu$ to zero
+\begin{eqnarray}
+  \frac{\partial\mathrm{log}\mathcal{L}(\mu, \sigma | \mathbf{x})}{\partial\mu}&=&  \sum_i^N\frac{(x_i - \mu)}{\sigma^2},
+\label{eq:max-likelihood2}
+\end{eqnarray}
+and setting this to zero give $\mu= \frac{1}{N}\sum_{i=1}^Nx_i$, i.e., the optimal $\mu$ is simply the average of the datapoints.\\
+\noindent{\bf (b)} The best quess for the next data-point $y^{i+1}$ is the expectation value of the distribution, which for the normal distribution $y \sim \mathcal{N}(\mu,\sigma)$ is simply the mean value $\mu$.\\
+\noindent {\bf (c).} The standard error of the mean $\frac{\mu}{\sqrt(N)}$ can be used to estimate the error of the guess $\mu$.
+
+\newpage
+\section{Three Random Variables}
+Consider the following table which indicates the presence of a particular property 
+(`A', `B' or `C') for a number of items (each item corresponds to one row). 
+% where each row corresponds to the presence of 
+%some property for a particular item. You can assume that the items are independent. 
+
+\begin{tabular}{c|c|c}
+\hline\hline
+A & B & C \\ [0.5ex] % inserts table %heading
+\hline
+1 & 0 & 1\\
+1 & 1 & 0 \\
+1 & 0 & 1 \\
+1 & 1 & 0 \\
+\hline
+\end{tabular}
+
+\begin{itemize}
+\item Can we predict if an item has property `B' if we know the presence of property `C' ?
+\item Can we predict if an item has property `A' if we know the presence of property `C' ?
+\end{itemize} 
+\noindent {\bf Answer.}
+
+\newpage
+\section{Expectations}
+Consider a $d$-dimensional Gaussian random vector $\vx \sim \mathcal{N}(\mathbf{0},\mathbf{I})$, 
+a random variable $e \sim \mathcal{N}(0,\sigma^{2})$. 
+For a fixed (non-random) vector $\mathbf{w}_{0} \in \mathbb{R}^{d}$, we construct the random variable $y= \vw_{0}^{T} \vx + e$. 
+Now consider another arbitrary (non-random) vector $\mathbf{w} \in \mathbb{R}^{d}$. 
+Find a closed-form expression for the expectation $\expect [ ( y - \vw^{T} \vx )^{2} ]$ in terms of the variance $\sigma^{2}$ and the vectors $\vw, \vw_{0}$. 
+
+\noindent {\bf Answer.}\\
+The distribution's, $\mathcal{N}(0, I)$, covariance matrix is an identity matrix
+and thus the distribution can be expressed as a product of $d$ one-dimensional
+gaussian distributions sampled from $\mathcal{N}(0,\frac{1}{2})$ and thus each element of vector $\mathbf{x}$ is normally distributed with $\mu =0$ and $\sigma^2=\frac{1}{2}$. Let $y_1$ be $y_1 = \mathbf{w_0^T}\mathbf{x} + e$ and $y_2 = \mathbf{w^T}\mathbf{x}$ . Because $y_1$ and $y_2$ are linear combinations of gaussian random variables it hold for both $y_1$ and $y_2$ that $\mu_{y_1} = 0$ and  $\mu_{y_2} = 0$ . For the variances it holds that $Var(y_1) = \frac{1}{2}\sum_{i=1}^d(w_0^i)^2 + \sigma^2$ and  $Var(y_2) = \frac{1}{2}\sum_{i=1}^d(w^i)^2$. Now the expectation $E\lbrack(y_1-y_2)^2\rbrack$ can be written as
+\begin{eqnarray}
+  E\lbrack(y_1-y_2)^2\rbrack &=& E\lbrack y_1^2\rbrack -2E\lbrack y_1y_2\rbrack + E\lbrack y_2^2\rbrack\\
+  &=& Var(y_1) + E\lbrack y_1\rbrack^2 + 2E\lbrack y_1\rbrack E\lbrack y_2\rbrack + Var(y_2) + E\lbrack y_2\rbrack^2\\
+  &=& Var(y_1) + Var(y_2)\\
+  &=& \frac{1}{2}\sum_{i=1}^d\left((w_0^i)^2 + (w^i)^2\right)+\sigma^2.
+  \label{eq:expectation_value}
+\end{eqnarray}
+In above the identities $Var(\mathbf{X}) = E\lbrack X^2\rbrack-E\lbrack X\rbrack^2$  and $E\lbrack y_1\rbrack = \mu_{y1} = E\lbrack y_2\rbrack\ = \mu_{y2} = 0$ were used.
+
+\end{document}
