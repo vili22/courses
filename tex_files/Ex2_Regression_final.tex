@@ -1,0 +1,369 @@
+
+\documentclass[article,11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, calc}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{graphicx,subfigure}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{ctable}
+\usepackage{subfig}
+\usepackage{bm, amssymb}
+\renewcommand*{\thesection}{Problem~\arabic{section}:}
+\renewcommand{\labelenumi}{(\alph{enumi})}
+\input{mlbp17_macros}
+
+\newcommand{\coefflen}{p}
+\setlength{\textheight}{53\baselineskip} % number of lines per side
+\setlength{\textheight}{51\baselineskip} % number of lines per side
+\textwidth176mm
+\oddsidemargin=-8mm
+\evensidemargin=-8mm  %Rand auf geraden Seiten ist etwa 24.5mm
+\topmargin=-18mm
+\unitlength1mm
+%\pagestyle{headings}
+%\renewcommand{\baselinestretch}{1.5}  % 1.1 fache des normalen Zeilenabstandes
+\renewcommand{\textfraction}{0.0}      % 10% einer Seite mit Gleitobjekt muÃ Text sein
+\addtolength{\hoffset}{-0.5cm}
+\addtolength{\voffset}{0.3cm}
+\addtolength{\topmargin}{-0.5cm}
+\addtolength{\textwidth}{1cm}
+\addtolength{\textheight}{1cm}
+
+\title{CS-E3210- Machine Learning Basic Principles \\ Home Assignment 2 - ``Regression''}
+\begin{document}
+\date{}
+\maketitle
+
+Your solutions to the following problems should be submitted as one single pdf which does not contain 
+any personal information (student ID or name). The only rule for the layout of your submission is that 
+each problem has to correspond to one single page, which has to include the problem statement on top 
+and your solution below. You are welcome to use the \LaTeX-file underlying this pdf, 
+available under \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public}, and fill in your solutions there. 
+
+\newpage
+\section{``Plain Vanilla'' Linear Regression}
+\label{problem_1_1}
+
+Consider a dataset $\dataset$ which is constituted of $\samplesize\!=\!10$ webcam snapshots with filename 
+``MontBlanc*$\sampleidx$*.png'', $\sampleidx=1,\ldots,\samplesize$, available in the folder ``Webcam'' at \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public}. 
+Determine for each snapshot the feature vector $\vx^{(\sampleidx)}=(x_{\rm g}^{(\sampleidx)},1)^{T} \in \inspace (= \mathbb{R}^{2})$ with the normalized (by the number of image pixels) greenness $x_{\rm g}^{(\sampleidx)}$. 
+Moreover, determine for each snapshot the label $y^{(\sampleidx)} \in \outspace (=\mathbb{R})$ given by the duration (in minutes) after 07:00 am, at which the picture has been taken. 
+We want to find (learn) a predictor $h(\cdot): \inspace \rightarrow \outspace$ which allows to predict the value of $y^{(\sampleidx)}$ directly from 
+the value of the feature $x_{\rm g}^{(\sampleidx)}$. To this end we consider only predictors belonging to the hypothesis space 
+$\hypospace = \{h^{(\vw)}(\vx) = \vw^{T} \vx \mbox{ for some } \vw \in \mathbb{R}^{2}\}$. 
+The quality of a particular predictor is measured by the mean squared error 
+\vspace*{-3mm}
+\begin{equation} \label{eq:1}
+ \emperror(h(\cdot) | \dataset) \defeq  \frac{1}{\samplesize}\sum^{\samplesize}_{\sampleidx=1}(y^{(\sampleidx)} - h(\vx^{(\sampleidx)}))^2= \frac{1}{\samplesize}\sum^{\samplesize}_{\sampleidx=1}(y^{(\sampleidx)} - \vw^{T} \vx^{(\sampleidx)})^2.
+\vspace*{-2mm}
+\end{equation} 
+Note that the mean squared error is nothing but the empirical risk obtained when using the squared error loss $\loss{(\vx,y)}{h(\cdot)} = (y - h(\vx))^{2}$ (cf.\ Lecture 2). 
+
+The optimal predictor $h_{\rm opt}(\cdot)$ is then
+\vspace*{-3mm}
+\begin{equation}
+\label{equ_opt_problem_hypo}
+h_{\rm opt}(\cdot)  = \argmin_{h(\cdot) \in \hypospace}  \emperror(h(\cdot) | \dataset). 
+\vspace*{-2mm}
+\end{equation}
+We can rewrite this optimization problem in a fully equivalent manner in terms of the weight 
+$\vw$ representing a particular predictor $h^{(\vw)}(\cdot) \in \hypospace$ as 
+\vspace*{-5mm}
+\begin{equation}
+\label{equ_opt_problem_weight}
+\vw_{\rm opt} = \argmin_{\vw \in \mathbb{R}^{2}}   \frac{1}{\samplesize}\sum^{\samplesize}_{\sampleidx=1}(y^{(\sampleidx)} - \vw^{T} \vx^{(\sampleidx)})^2. 
+\vspace{-3mm}
+\end{equation}
+As can be verified easily, the optimal predictor $h_{\rm opt}(\cdot)$ (cf.\ \eqref{equ_opt_problem_hypo}) is obtained as 
+$h_{\rm opt}(\cdot) = h^{(\vw_{\rm opt})}(\cdot)$ with the optimal weight vector $\vw_{\rm opt}$ (cf.\ \eqref{equ_opt_problem_weight}).
+
+Can you find a closed-form expression for the optimal weight $\vw_{\rm opt}$ (cf.\ \eqref{equ_opt_problem_weight}) in terms of the vectors 
+$\vx = (x_{\rm g}^{(1)},\ldots,x_{\rm g}^{(\samplesize)})^{T} \in \mathbb{R}^{\samplesize}$, and $\vy = (y^{(1)}, \ldots,y^{(\samplesize)})^{T}\in \mathbb{R}^{\samplesize}$?
+
+\noindent{\bf Answer.}\\
+We can try to estimate duration from 7:00am as a linear combination of the greeness of the picture and a constant term, \textit{i.e.}, $y^i= w_1x_g^i + w_0 = (x_g^i, 1)(w_1, w_0)^T$. For multiple measurements this can be written as
+\begin{eqnarray}
+  y_1 &=& w_1x_g^1 + w0\nonumber\\
+  y_2 &=& w_1x_g^2 + w0\nonumber\\
+  &\mathrel{\makebox[\widthof{=}]{\vdots}}\nonumber \\
+  y_n &=& w_1x_g^n + w0,
+\label{eq:equation-array}
+\end{eqnarray}
+which can be written in matrix form as
+\begin{equation}
+  \mathbf{y} = A\mathbf{w},
+  \label{eq:matrix_form}
+\end{equation}
+where $\mathbf{y} = (y_1, y_2, y_3,\cdots,y_n)$, $A = (x_g^1,1; x_g^2,1;\cdots;x_g^n,1)$ and $\mathbf{w} = (w_1,w_0)^T$. From equation \ref{eq:matrix_form} the optimal weight vector $\mathbf{w}_{\mathrm{opt}}$ can be found using the well known least squares solution
+\begin{equation}
+  \mathbf{w}_{\mathrm{opt}} = (A^TA)^{-1}A^T\mathbf{y}.
+  \label{eq:least-squares-solution}
+\end{equation}
+We can reformulate this using $B=(\mathbf{x}\:\mathbf{c})$ ($\mathbf{c}$
+is a $n\times 1$ column vector) which have a pseudo-inverse $B^+=B^T(BB^T)^{-1}$.
+The inverse $(BB^T)^{-1}$ can be written as $(\mathbf{x}\mathbf{x}^T + cc^T)^{-1}$
+which can be further written using Sherman-Morrison formula as
+\begin{equation}
+  (\mathbf{x}\mathbf{x}^T+\mathbf{c}\mathbf{c}^T)^{-1}=(\mathbf{x}\mathbf{x}^T)^{-1}(I-\mathbf{c}\mathbf{u}),
+  \label{eq:sherman-morrison}
+\end{equation}
+where $\mathbf{u} = \frac{\mathbf{c}^T(\mathbf{x}\mathbf{x}^T)^{-1}}{1+\mathbf{v}^T(\mathbf{x}\mathbf{x}^T)^{-1}\mathbf{v}}$. Inserting this into $B^+$ gives
+\begin{eqnarray}
+  \mathbf{w}_{\mathrm{opt}}&=&\mathbf{B}^+\mathbf{y}\nonumber\\
+  &=&(\mathbf{x}\:\mathbf{c})^T(\mathbf{x}\mathbf{x}^T)^{-1}(I-\mathbf{v}\mathbf{u})\mathbf{y}.
+\label{eq:closed-form-x}
+\end{eqnarray}
+
+
+\newpage
+\section{``Plain Vanilla'' Linear Regression - Figure}
+\label{problem_1}
+
+Reconsider the setup of Problem 1 and generate a plot with horizontal (vertical) axis representing greenness $x_{\rm g}$ (label $y$), which depicts the optimal predictor 
+$h_{\rm opt}(\cdot)$ (cf.\ \eqref{equ_opt_problem_hypo}) and also contains the data points $(x_{\rm g}^{(\sampleidx)},y^{(\sampleidx)})$ for $\sampleidx=1,\ldots,\samplesize$. 
+Do you consider it feasible to predict the daytime accurately from the greenness?
+
+\noindent{\bf Answer.}\\
+The durations from 7:00am in minutes can be read from each picture and the
+picture data can be read using SciPy. The data points $(x_g^i, y^i)$ as well as
+the predicted durations, obtaines using eq. (\ref{eq:least-squares-solution}),
+are shown in figure \ref{fig:linearregression}. According to figure
+\ref{fig:linearregression} the time can be rather well estimated from the
+greenness of the image in the given time interval.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.6\linewidth]{ex2_2.eps}
+  %\epsfig{file=ex1_1.eps,width=0.6\linewidth,clip=}
+  %\includegraphics[width=0.6\linewidth]{./figures/GaAsN2}
+  \caption{Measured (red dots) and predicted (blue dots) durations since 7:00am
+    as a function of image greenness. The green line illustrates the optimal
+    linear fit.}
+  \label{fig:linearregression}
+\end{figure}
+
+\newpage
+
+
+\newpage
+
+\section{Regularized Linear Regression}
+We consider again the regression problem of Problem 1, i.e., predicting the daytime of a webcam snapshot based on 
+the feature vector $(x_{\rm g},1)^{T}$. The prediction is of the form $h^{(\vw)}(\vx) = \vw^{T} \vx$ 
+with some weight vector $\vw \in \mathbb{R}^{2}$. Assume that we only have snapshots which are taken within $7$ hours after 07:00 am, i.e.,the 
+value of the label $y$ cannot exceed $420$. Therefore, it makes sense to somehow constraint the norm of the weight vector $\vw$ to 
+exclude unreasonable predictions. To this end, we augment the mean squared error \eqref{eq:1} with the ``regularization term'' $\lambda \| \vw\|^{2} $ 
+which penalizes ``atypical'' values for the weight vector. The optimal predictor $h_{\rm opt}(\cdot)$ using this regularization term is then given by 
+\begin{equation}
+\label{equ_opt_problem_hypo_r}
+h_{\rm opt,r}(\cdot)  = \argmin_{h(\cdot) \in \hypospace}  \emperror(h(\cdot) | \dataset)+ \lambda \| \vw \|^{2}. 
+\vspace*{-2mm}
+\end{equation}
+Again, we can rewrite this optimization problem in a fully equivalent manner in terms of the weight 
+$\vw$ representing a particular predictor $h^{(\vw)}(\cdot) \in \hypospace$ as 
+\vspace*{-5mm}
+\begin{equation}
+\label{equ_opt_problem_weight_r}
+\vw_{\rm opt,r} = \argmin_{\vw \in \mathbb{R}^{2}}   \frac{1}{\samplesize}\sum^{\samplesize}_{\sampleidx=1}(y^{(\sampleidx)} - \vw^{T} \vx^{(\sampleidx)})^2 + \lambda \| \vw \|^{2}. 
+\vspace{-3mm}
+\end{equation}
+As can be verified easily, the optimal predictor $h_{\rm opt,r}(\cdot) \in \hypospace$ solving \eqref{equ_opt_problem_hypo} is obtained as 
+$h_{\rm opt,r}(\cdot) = h^{(\vw_{\rm opt,r})}(\cdot)$ with the optimal weight vector $\vw_{\rm opt,r}$ which is the solution of \eqref{equ_opt_problem_weight}.
+Can you find a closed-form solution for the optimal weight $\vw_{\rm opt,r}$ (cf.\ \eqref{equ_opt_problem_weight}) in terms of the vectors 
+$\vx = (x_{\rm g}^{(1)},\ldots,x_{\rm g}^{(\samplesize)})^{T} \in \mathbb{R}^{\samplesize}$, and $\vy = (y^{(1)}, \ldots,y^{(\samplesize)})^{T}\in \mathbb{R}^{\samplesize}$ and $\lambda$?\\
+\noindent {\bf Answer:}
+The solution for regularized problem can be written as
+\begin{eqnarray}
+  \mathbf{w}_\mathrm{opt}&=&(A^TA+\lambda^2I)^{-1}A^Ty\nonumber\\
+  &=&(B^TB+\lambda^2I)^{-1}B^T\mathbf{y},
+  \label{regularized solution}
+\end{eqnarray}
+where matrices $A$ and $B$ are defined in section \ref{problem_1_1}. The inverse
+$(B^TB+\lambda^2I)^{-1}$ can be written, using Woodbury matrix identity, in the
+form
+\begin{equation}
+  (B^TB+\lambda^2I)^{-1}=(BB^T)^{-1}-\lambda^2(BB^T)^{-1}(I + \lambda^2(BB^T)^{-1})^{-1}(BB^T)^{-1}.
+  \label{eq:woodburyidentity}
+\end{equation}
+Inserting (\ref{eq:woodburyidentity}) into eq. (\ref{regularized solution}) and
+using identity $(BB^T)^{-1}=(\mathbf{x}\mathbf{x}^T)^{-1}(I-\mathbf{c}\mathbf{u})$ from section \ref{problem_1_1} the solution for
+$\mathbf{w}_\mathrm{opt}$ can be finally written in the form
+\begin{equation}
+  \mathbf{w}_\mathrm{opt}=\left((\mathbf{x}\mathbf{x}^T)^{-1}(I-\mathbf{c}\mathbf{u})-\lambda^2(\mathbf{x}\mathbf{x}^T)^{-1}(I-\mathbf{c}\mathbf{u})(I-\lambda^2(\mathbf{x}\mathbf{x}^T)^{-1}(I-\mathbf{c}\mathbf{u}))^{-1}(\mathbf{x}\mathbf{x}^T)^{-1}(I-\mathbf{c}\mathbf{u})\right)(\mathbf{x}\:\mathbf{c})^T\mathbf{y}.
+\end{equation}
+  
+  
+
+\newpage
+\section{Regularized Linear Regression - Figure}
+Reconsider the setup of Problem 3 and generate a plot with horizontal (vertical) axis representing greenness $x_{\rm g}$ (label $y$) 
+which contains the data points $(x_{\rm g}^{(\sampleidx)},y^{(\sampleidx)})$, for $\sampleidx=1,\ldots,\samplesize$, and 
+depicts the optimal predictor $h_{\rm opt,r}(\cdot)$ (cf.\ \eqref{equ_opt_problem_hypo_r}) for the two particular choices $\lambda=2$ and $\lambda=5$. 
+Which choice for $\lambda$ seems to be better for the given task? 
+
+\noindent {\bf Answer:}\\
+The data points $(x_g^i, y^i)$ as well as the predicted durations (blue dots
+corresponding to $\lambda=2$, red dots corresponding ot $\lambda=5$), obtained
+using eq. (\ref{regularized solution}), are shown in figure
+\ref{fig:regularizedlinearregression}. According to figure
+\ref{fig:regularizedlinearregression} clearly the best prediction is given by
+the unregularized solution. Both regularized solutions with $\lambda=2$ and
+$\lambda=5$ performs nearly identically, the $\lambda=2$ solution being slightly
+better.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.6\linewidth]{ex2_4.eps}
+  %\epsfig{file=ex1_1.eps,width=0.6\linewidth,clip=}
+  %\includegraphics[width=0.6\linewidth]{./figures/GaAsN2}
+  \caption{Regularized solutions. The blue dots corresponds to solution $\lambda=2$ and the red dots corresponds to $\lambda=5$. The black line represents the
+  optimal prediction without regularization.}
+  \label{fig:regularizedlinearregression}
+\end{figure}
+
+\newpage
+\section{Gradient Descent for Linear Regression}
+Consider the same dataset as in Problem 1, i.e., the set of $\samplesize=10$ webcam snapshots which are labeled by the daytime $y^{(\sampleidx)}$ 
+when the image has been taken. As in Problem 1, we are interested in predicting the daytime directly from the image. However, by contrast 
+to Problem 1 where we only used the greenness $x_{\rm g}^{(\sampleidx)}$ of the $\sampleidx$-th image, we know use the green intensity 
+values for the upper-left area consisting of $100 \times 100$ pixels, 
+which we stack into the feature vector $\vx^{(\sampleidx)} \in \mathbb{R}^{d}$. What is the length $d$ of the feature vector $\vx^{(\sampleidx)}$ here? 
+Based on the feature vector, we predict the daytime by a predictor of the form $h^{(\vw)}(\vx) = \vw^{T} \vx$ with some weight vector $\vw \in \mathbb{R}^{d}$. 
+The optimal predictor is obtained by solving an empirical risk minimization problem of the form \eqref{equ_opt_problem_hypo}, 
+or directly in terms of the weight vector, \eqref{equ_opt_problem_weight}. This minimization problems can be solved by a simple but powerful iterative method 
+known as gradient descent (GD): 
+\vspace*{-2mm}
+\begin{equation}
+\label{equ_GD_iteration}
+    \vw^{(k+1)} = \vw^{(k)} - \alpha \nabla f(\vw) 
+ \vspace*{-2mm}
+\end{equation}
+with some positive step size $\alpha >0$ and the mean-squared error cost function (cf.\ \eqref{eq:1}) 
+\vspace*{-2mm}
+\begin{equation} 
+f(\vw) \defeq \emperror(h^{(\vw)}|\dataset) \stackrel{\eqref{eq:1}}{=} \frac{1}{\samplesize}\sum^{\samplesize}_{\sampleidx=1}(y^{(\sampleidx)} - \vw^{T} \vx^{(\sampleidx)})^2. \nonumber
+\vspace*{-2mm}
+\end{equation} 
+In order to implement the GD iterations \eqref{equ_GD_iteration}, we need to compute the gradient $\nabla f(\vw)$. 
+Can you find a simple closed-form expression for the gradient of $f(\mathbf{w})$ at a particular weight vector $\vw$?
+
+The performance of GD depends crucially on the particular value chosen for the step size $\alpha$ in \eqref{equ_GD_iteration}. 
+Try out different choices for the step size $\alpha$ and, for each choice plot the evolution of the empirical risk 
+$\emperror(h^{(\vw^{(k)})}| \dataset)$ as a function of iteration number $k$ into one single figure. 
+Use the initialization $\vw^{(0)} = \mathbf{0}$ for the GD iterations for each run. 
+
+Another crucial issue when using GD is the question of when to stop iterating \eqref{equ_GD_iteration}. Can you 
+state a few stopping criteria that indicate when it would be reasonable to stop iterating \eqref{equ_GD_iteration}?
+
+\noindent {\bf Answer:}\\
+The  $100\times 100$ region can be stacked to $10000\times 1$ feature vector and
+by taking into accout the constant term we get a total of $d =10001$ elements in
+the feature vector $\mathbf{x}^{(i)}$. The error cost function $f(\mathbf{w})$
+can be written equivalently in the form $f(\mathbf{w})=\frac{1}{N}\sum_{i=1}^N(y^i-\mathbf{x}^{(i)T}\mathbf{w})$. It is good to notice that  $\mathbf{x}_1^{(i)}=1$. Taking partial derivative of $f(\mathbf{w})$ with respect to $w_j$ gives
+\begin{eqnarray}
+  \frac{\partial f}{\partial w_j} &=&-\frac{2}{N}\sum_{i=1}^Nx_j^{(i)}(y^i-\mathbf{x}^{(i)T})\nonumber\\
+  &=&-\frac{2}{N}X_j(\mathbf{y}-X^T\mathbf{w}),
+  \label{eq:partial-derivative}
+\end{eqnarray}
+where $x_j^{(i)}$ denotes the j-th element of feature vector $i$, $X=(\mathbf{x}^{(1)}\:\mathbf{x}^{(2)} \ldots \mathbf{x}^{(N)})$ and $X_j$ is the j-th row of $X$.
+The the total gradient vector then becomes $\nabla f(\mathbf{w})=-\frac{2}{N}X(\mathbf{y}-X^T\mathbf{w})$.
+Figure \ref{fig:lineargradientdescent} shows convergence of the gradient descent
+method with different alphas. Possible stopping crieteria for the iterationa are
+difference in error functions between iterations, relative difference between
+erro functions between iterations and the maximum number of iteration
+(used here).
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.25\linewidth]{ex2_5.eps}
+  %\epsfig{file=ex1_1.eps,width=0.6\linewidth,clip=}
+  %\includegraphics[width=0.6\linewidth]{./figures/GaAsN2}
+  \caption{Empirical risk as a function of iteration number. The red curve corresponds to $\alpha=0.000001$, the green curve corresponds to $\alpha=0.00001$ and
+the blue curve corresponds to $\alpha=0.0001$}
+  \label{fig:lineargradientdescent}
+\end{figure}
+  
+
+
+\newpage
+\section{Gradient Descent for Regularized Linear Regression}
+Redo Problem 5 for regularized linear regression (Problem 3) instead of linear
+regression (Problem 1). 
+
+\noindent {\bf Answer:}\\
+When the regularized regression is used the total gradient can be written in the
+form
+\begin{equation}
+  \nabla f(\mathbf{w})=-\frac{2}{N}X(\mathbf{y}-X^T\mathbf{w}) +2\lambda\mathbf{w}.
+  \label{eq:totalgradientregularized}
+\end{equation}
+Figure \ref{fig:regularizedgradient} shows the convergence of gradient-descent
+as a function of iteration number for lambda values $\lambda=2$ and $\lambda=5$.
+\begin{figure}[!h]
+  \centering
+  \subfigure[$\lambda=2$]{\includegraphics[width=0.4\linewidth]{ex2_6_1.eps}}
+  \subfigure[$\lambda=5$]{\includegraphics[width=0.4\linewidth]{ex2_6_2.eps}}
+  \caption{Empirical risks as a function of iteration number for two different
+      values of $\lambda$ (left $\lambda=2$, right $\lambda=5$). The red curve
+      corresponds to $\alpha=0.000001$, the green curve corresponds to
+      $\alpha=0.00001$ and the blue curve corresponds to $\alpha=0.0001$}
+  \label{fig:regularizedgradient}
+\end{figure}
+
+\newpage
+\section{Kernel Regression}
+Consider the data set of Problem 1, i.e., the set of $\samplesize=10$ webcam snapshots. Let us now represent each webcam snapshot by 
+the single feature $x^{(\sampleidx)} = x_{\rm g}^{(\sampleidx)}$, i.e., the total greenness of the $\sampleidx$th snapshot. We aim 
+at predicting the daytime $y^{(\sampleidx)}$ based solely on the greenness. In contrast to Problem 1 and Problem 2 we will now 
+use a different hypothesis space of predictors. In particular, we only consider predictors out of the hypothesis space
+\begin{equation}
+\hypospace = \bigg\{h^{(\sigma)}(\cdot): \mathbb{R} \rightarrow \mathbb{R}: h^{(\sigma)} (x) = \sum_{\sampleidx=1}^{\samplesize} y^{(\sampleidx)} \frac{K_\sigma(x,x^{(\sampleidx)})}{\sum_{l=1}^{\samplesize} K_\sigma (x,x^{(l)})} \bigg\}
+\end{equation}
+with the ``kernel''  
+\begin{equation}
+K_\sigma(x, x^{(\sampleidx)}) = \exp \Bigg( -\frac{1}{2} \frac{(x-x^{(\sampleidx)})^2 }{\sigma^2} \Bigg).
+\end{equation}
+Try out predicting the daytime $y^{(\sampleidx)}$ using the greenness $x_{\rm g}^{(\sampleidx)}$ using a predictor $h^{(\sigma)}(\cdot) \in \hypospace$ using the 
+choices $\sigma \in \{1,5,10\}$. Generate a plot with horizontal (vertical) axis representing greenness $x_{\rm g}$ (label $y$), which depicts the predictor 
+$h^{(\sigma)}(\cdot)$ for $\sigma \in \{1,5,10\}$ and also contains the data points $(x_{\rm g}^{(\sampleidx)},y^{(\sampleidx)})$.
+Which choice for $\sigma$ achieves the lowest mean squared error $\emperror(h^{(\sigma)}| \dataset)$ (cf. \eqref{eq:1}) ?
+
+\noindent {\bf Answer:}\\
+The predictor $h^{(\sigma)}$ for $\sigma$ values $\{1,5,10\}$ is shown in figure
+\ref{fig:kernelregression}. Clearly the lowest mean squared error is obtained
+with $\sigma=1$.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.6\linewidth]{ex2_7.eps}
+  %\epsfig{file=ex1_1.eps,width=0.6\linewidth,clip=}
+  %\includegraphics[width=0.6\linewidth]{./figures/GaAsN2}
+  \caption{The predictor $h^{(\sigma)}$ for different values of $\sigma$. The red
+    curve corresponds to $\sigma=1$, the green curve corresponds to
+    $\sigma=5$ and the blue curve corresponds to $\sigma=10$}
+  \label{fig:kernelregression}
+\end{figure}
+
+\newpage
+\section{Linear Regression using Feature Maps}
+Consider a regression problem, where we aim at predicting the value of a real-valued label or target or output variable $y \in \mathbb{R}$ of a data point 
+based on a single feature $x \in \mathbb{R}$ of this data point. We assume that there is some true underlying functional relationship between 
+feature $x$ and output $y$, i.e., $y =h^{*}(x)$ with some unknown function (hypothesis). All we know about this true underlying functional relationship is 
+that 
+\vspace*{-2mm}
+\begin{equation}
+\label{equ_properties_hypo}
+h^{*}(x) = 0 \mbox{ for any } x \notin [0,10]  \mbox{, and } |h^{*}(x') -h^{*}(x'')| \leq 10^{-3} |x'-x''| \mbox{ for any } x',x'' \in[0,10]. 
+\vspace*{-2mm}
+\end{equation}
+We apply then a feature map ${\bm \phi}: \mathbb{R} \rightarrow \mathbb{R}^{n}$, with some suitable chosen dimension $n$, which transforms 
+the original feature $x$ into a modified feature vector ${\bm \phi}(x)=(\phi_{1}(x),\ldots,\phi_{n}(x))^{T}$. We use the transformed features 
+${\bm \phi}(x)$ to predict the label $y$ using the predictor $h^{(\mathbf{w})}(x) = \mathbf{w}^{T} {\bm \phi}(x)$ with some weight vector $\mathbf{w}\in \mathbb{R}^{n}$. 
+Note that the so defined predictor $h^{(\mathbf{w})}$ is linear only w.r.t.\ the high-dimensional features ${\bm \phi}(x)$, but typically 
+a non-linear function of the original feature $x$. Is there a feature map ${\bm \phi}$ such that for any hypothesis $h^{*}(\cdot)$, which satisfies \eqref{equ_properties_hypo}, 
+there is always a weight vector $\mathbf{w}_{0} \in \mathbb{R}^{n}$ such that $|h^{(\mathbf{w}_{0})}(x) - h^{*}(x)| \leq 10^{-3}$ for all $x \in \mathbb{R}$?
+
+\noindent {\bf Answer:}
+\end{document}
+
