@@ -118,6 +118,8 @@ where $\mathbf{u} = \frac{\mathbf{c}^T(\mathbf{x}\mathbf{x}^T)^{-1}}{1+\mathbf{v
   &=&(\mathbf{x}\:\mathbf{c})^T(\mathbf{x}\mathbf{x}^T)^{-1}(I-\mathbf{v}\mathbf{u})\mathbf{y}.
 \label{eq:closed-form-x}
 \end{eqnarray}
+The measured labels, \textit{i.e.}, duration since 7:00pm and the greeness of
+images are shown in figure \ref{fig:linearregression} in the next section.
 
 
 \newpage
@@ -132,7 +134,8 @@ Do you consider it feasible to predict the daytime accurately from the greenness
 The durations from 7:00am in minutes can be read from each picture and the
 picture data can be read using SciPy. The data points $(x_g^i, y^i)$ as well as
 the predicted durations, obtaines using eq. (\ref{eq:least-squares-solution}),
-are shown in figure \ref{fig:linearregression}. According to figure
+are shown in figure \ref{fig:linearregression}. The greeness of the image is
+calculated using equation $x_g=\frac{1}{N}\sum_{j=1}^N(g\lbrack j\rbrack -(1/2)(r\lbrack j\rbrack+b\lbrack j\rbrack ))$ where $N$ is the total number of pixels in picture $i$. According to figure
 \ref{fig:linearregression} the time can be rather well estimated from the
 greenness of the image in the given time interval.
 \begin{figure}[!h]
