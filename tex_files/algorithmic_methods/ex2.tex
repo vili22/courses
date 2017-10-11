@@ -178,63 +178,39 @@ Now for $Var(Y)$ we get
   &=&\frac{1}{k}\sigma^2.
 \end{eqnarray}
 
-\section{Max-match distance}
-Solutions presented in this section are heavily based on the following sources
-\url{https://en.wikipedia.org/wiki/Hausdorff_distance} and \url{http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/98/normand/main.html}\\
+\section{Distinct elements in stream}
+\noindent{\bf Answer Q6.1.}\\
+If only two float are allowed to keep in memory, then one could keep in memory
+the minimum $a_{min}$ and maximum $a_{max}$ values encountered. The number of
+distinct elements can then be estimated base on the minimum and maximum values
+as $a_{min}=\frac{1}{n+1}\rightarrow n_{minest}=\frac{1}{a_{min}}-1$ and $a_{max}=\frac{n}{n+1}\rightarrow n_{maxest}=\frac{a}{1-a}$ and the estimate for the
+distinct elements can then be chosen to be the average $n = \frac{n_{minest}+n_{maxest}}{2}$.\\
 
-\noindent{\bf Answer Q4.1.}\\
-One possible example of an object $X$ would be a graph. In this case $U$ would
-be the set of all possible vertices and $d$ would describe the distance
-between two vertices.\\
-
-\noindent{\bf Answer Q4.2.}\\
-The max-match distance $d(A,B)$ described above is the at most distance of any
-vertex in $A$ from vertices of $B$. Another possibility would be
-calculate the minimum distance between points of $A$ and $B$. However this
-distance is sensitive to the orientation of graphs $A$ and $B$ and thus the
-max-match distance is more descriptive.\\
-
-\noindent{\bf Answer Q4.3.}\\
-The max-match distance is not a proper metric because requirement $d(A,B) = d(B,A)$ is not fulfilled. However an induced metric $d'(A,B) = max\{ d(A,B), d(B,A)\}$ is a proper metric as stated in \url{https://en.wikipedia.org/wiki/Hausdorff_distance}.\\
-
-\noindent{\bf Answer Q4.4.}\\
-The max-match algorithm could be implemented using the algorithm \ref{maxmatch}
-(see next page) which running time scales as $\mathcal{O}(n^2)$\\
-\begin{algorithm}
-  \caption{Max-match algorithm}
-  \textbf{Input: } graphs $X = \{ x_1,\ldots ,x_n\}$ and
-  $Y = \{y_1,,\ldots,y_n\}$, Euclidean-distance $d$\\
-  \textbf{Output: } Max-match distance $dmaxmatch$ between graphs $X$ and $Y$ 
- \begin{algorithmic}[1]
-   \State $maxmatch\gets 0$
-   \For{$ i=1,\ldots ,n$}
-   \State $dmin \gets d(x_i, y_1)$
-   \For{$j=2,\ldots ,n$}
-   \State $dtmp\gets d(x_i,y_j)$
-   \If {$dtmp < dmin$}
-   \State $dmin\gets dtmp$
-   \EndIf
-   \EndFor
-   \If {$dmin > dmaxmatch$}
-   \State $dmaxmatch\gets dmin$
-   \EndIf
-   \EndFor
-   \State \textbf{return} $dmaxmatch$
- \end{algorithmic}
- \label{maxmatch}
-\end{algorithm}\\
-\noindent{\bf Answer Q4.5.}\\
-Instead of calculating the exact $D(X,Y)$ one could select a particular subset
-of points $X_S \in X$ and calculate the distance $D(X_s, Y)$ instead of
-$D(X,Y)$. For this distance it is guaranteed that $D(X_s, Y) <= D(X, Y)$. One
-possible subset could be the points of $X$ that are located on the minimum
-bounding box of $X$.\\
-
-\noindent{\bf Answer Q4.6.}\\
-An algorithm that calculates the lower bound distance using the above
-description can be obtained by calculating points located on the minimum
-bounding box of $X$, $X_S = mbb(X)$, and giving the resulting set $X_s$ as
-input to algorithm \ref{maxmatch} instead of $X$. This algorithm would scale as
-$\mathcal{O}(2^dn)$ where $d$ is the dimension of data-points in $X$ and $Y$ and
-$n$ is the number of points in $Y$.
+\noindent{\bf Answer Q6.2.}\\
+Lets prove that on expectation $a_{max}=\frac{n}{n+1}$ and $a_{min}=\frac{1}{n+1}$
+where $n$ is the number of distinct elements sampled from the uniform distribution in the interval $\lbrack 0,1\rbrack$. The probability that for single
+element the sampled value is smaller than $x$ is $p(X_1 <=x)=F(x)=x$ where $F$
+is the cumulative distribution function of uniform distribution on interval $\lbrack 0,1\rbrack$. Because the sampled elements are independent, for $n$ distinct
+elements the probabity $P({X_1,X_2,\ldots,X_n}\leq x) = x^n$ and the probability
+density $p(x)$ that all $X_i$ are smaller than value $x$ is obtained as
+derivative of $x^n \rightarrow p(x)=nx^{n-1}$. Thus the expectation value of
+$x$ is obtained as
+\begin{eqnarray}
+  E\lbrack x_{max}\rbrack&=&\int_0^1xnx^{n-1}dx\nonumber\\
+  &=&\frac{n}{n+1}\int_0^1(n+1)x^ndx\nonumber\\
+  &=&\frac{n}{n+1}\Big|_0^1x^{n+1}\nonumber\\
+  &=&\frac{n}{n+1}.
+\end{eqnarray}
+Similarly for the smallest value on expectation can be obtained as
+$P({X_1|X_2|\ldots|X_n}\leq x) = 1 -P({X_1,X_2,\ldots,X_n}\geq x) = 1-(1-x)^n$
+and the probality density function becomes $p(x)=n(1-x)^{n-1}$ and the expectation of minimum value is again obtained as
+\begin{eqnarray}
+  E\lbrack x_{min}\rbrack&=&\int_0^1xn(1-x)^{n-1}dx\nonumber\\
+  &=&\frac{1}{n+1}.
+\end{eqnarray}
+\noindent{\bf Answer Q.6.3.}\\
+If it is possible to hold $2m$ floats on memory while having $m$ hash functions
+an improved estimate for distinct elements could be obtained by estimating
+the number of distinct elements from every hash function, as was described in
+6.1, and taking average of all those estimates.
 \end{document}

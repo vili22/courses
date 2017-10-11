@@ -1,0 +1,193 @@
+\documentclass[article,11pt]{article}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{bm, amssymb}
+\usepackage{subfigure}
+\renewcommand*{\thesection}{Problem~\arabic{section}:}
+\renewcommand{\labelenumi}{(\alph{enumi})}
+
+\input{mlbp17_macros}
+
+\title{CS-E3210- Machine Learning Basic Principles \\ Home Assignment 3 - ``Classification''}
+\begin{document}
+\date{}
+\maketitle
+
+Your solutions to the following problems should be submitted as one single pdf which does not contain 
+any personal information (student ID or name).  The only rule for the layout of your submission is that for each 
+problem there has to be exactly one separate page containing the answer to the problem. You are welcome to use the \LaTeX-file underlying this pdf, 
+available under \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public}, and fill in your solutions there. 
+
+\newpage
+
+\section{Logistic Regression - I}
+Consider a binary classification problem where the goal is classify or label a webcam snapshot into ``winter'' ($y=-1$) or ``summer'' ($y=1$) based on the feature vector 
+$\vx=(x_{\rm g},1)^{T} \in \mathbb{R}^{2}$ with the image greenness $x_{\rm g}$. A particular classification 
+method is logistic regression, where we classify a datapoint as $\hat{y}=1$ if $h^{(\vw)}(\vx)=\sigma(\vw^T\vx) > 1/2$ and $\hat{y}=-1$ otherwise. Here, we used the sigmoid function 
+$\sigma(z) = 1/(1+\exp(-z))$. 
+
+The predictor value $h^{(\vw)}(\vx)$ is interpreted as the probability of $y=1$ given the knowledge of the feature vector $\vx$, i.e., $P(y=1|\vx;\vw) = h^{(\vw)}(\vx)$. Note that 
+the conditional probability $P(y=1|\vx;\vw)$ is parametrized by the weight vector $\mathbf{w}$.
+We have only $N=2$ labeled data points with features $\vx^{(1)}, \vx^{(2)}$ and labels $y^{(1)}=1, y^{(2)}=-1$ at our disposal in order to find a good choice for $\vw$. 
+Let $\vw_{\rm ML}$ be a vector which satisfies 
+\vspace*{-3mm}
+\begin{equation} 
+P(y\!=\!1|\vx^{(1)};\vw_{\rm ML}) P(y\!=\!-1|\vx^{(2)};\vw_{\rm ML}) = \max_{\vw \in \mathbb{R}^{2}} P(y\!=\!1|\vx^{(1)};\vw) P(y\!=\!-1|\vx^{(2)};\vw). \nonumber
+\vspace*{-3mm}
+\end{equation} 
+Show that the vector $\vw_{\rm ML}$ solves the empirical risk minimization problem using logistic loss $L((\vx,y); \vw) = \ln\big(1 + \exp\big(- y (\vw^{T} \vx)\big))\big)$, i.e., $\vw_{\rm ML}$ is 
+a solution to 
+\vspace*{-2mm}
+$$\min\limits_{\vw \in \mathbb{R}^{2}} (1/\samplesize) \sum_{\sampleidx=1}^{\samplesize} L((\vx^{(\sampleidx)},y^{(\sampleidx)}); \vw).$$
+
+ 
+\noindent {\bf Answer.}\\
+Because $\min\limits_{z}\mathrm{ln}(1+\mathrm{exp}(-z)) = \max\limits_{z}\mathrm{ln}((1+\mathrm{exp}(-z))^{-1})$ the logistic loss can be converted to
+\begin{eqnarray}
+  \min\limits_{\vw \in \mathbb{R}^{2}} (1/N) \sum_{i=1}^{N} L((\vx^{(\i)},y^{i});\vw) &=&  \max\limits_{\vw \in \mathbb{R}^{2}}\sum_{i=1}^{N}\mathrm{ln}(\frac{1}{1+\mathrm{exp}(-y^i(\vw\vx))})\nonumber\\
+  &=&\max\limits_{\vw \in \mathbb{R}^{2}}\left(\sum_{y^i=1}\mathrm{ln}(\frac{1}{1+\mathrm{exp}(-\vw\vx^{(y^i)})}) + \sum_{y^i=-1}\mathrm{ln}(\frac{1}{1+\mathrm{exp}(\vw\vx^{(y^i)})}\right)\nonumber\\
+   &=&\max\limits_{\vw \in \mathbb{R}^{2}}\left(\sum_{y^i=1}\mathrm{ln}(\frac{1}{1+\mathrm{exp}(-\vw\vx^{(y^i)})}) + \sum_{y^i=-1}\mathrm{ln}(1-\frac{1}{\mathrm{exp}(-\vw\vx^{(y^i)})}\right)\nonumber\\
+  &=&\max\limits_{\vw \in \mathbb{R}^{2}}\left(\mathrm{ln}(\frac{1}{1+\mathrm{exp}(-\vw\vx^{(1)})}) + \mathrm{ln}(1-\frac{1}{1+\mathrm{exp}(-\vw\vx^{(2)})})\right)\nonumber\\
+  &=&\max\limits_{\vw \in \mathbb{R}^{2}}\left(\mathrm{ln}(P(y=1|\vx^{(1)};\vw) + \mathrm{ln}(P(y=-1|\vx^{(2)};\vw)\right)\nonumber\\
+  &=&\max\limits_{\vw \in \mathbb{R}^{2}}\mathrm{ln}(P(y=1|\vx^{(1)};\vw)P(y=-1|\vx^{(2)};\vw))\nonumber\\
+  &=&\max\limits_{\vw \in \mathbb{R}^{2}}P(y=1|\vx^{(1)};\vw)P(y=-1|\vx^{(2)};\vw)\nonumber,
+  \label{eq:max_like}
+\end{eqnarray}
+and thus the vector $\mathbf{w}_{\mathrm{ML}}$ is the solution to logistic loss.
+In above the fact $P(y=-1|\vx^{(2)};\vw) = 1 - P(y=1|\vx^{(2)};\vw)$ was used. 
+\newpage
+
+\section{Logistic Regression - II}
+Consider a binary classification problem where the goal is classify or label a webcam snapshot into ``winter'' ($y=-1$) or ``summer'' ($y=1$) based on the feature vector 
+$\vx=(x_{\rm g},1)^{T} \in \mathbb{R}^{2}$ with the image greenness $x_{\rm g}$. A particular classification 
+method is logistic regression, where we classify a datapoint as $\hat{y}=1$ if $h^{(\vw)}(\vx)=\sigma(\vw^T\vx) > 1/2$ and $\hat{y}=-1$ otherwise. Here, we used the sigmoid function 
+$\sigma(z) = 1/(1+\exp(-z))$. 
+
+Given some labeled snapshots $\dataset = \left\lbrace (x^{\sampleidx)}, y^{(\sampleidx)}) \right\rbrace_{\sampleidx=1}^{\samplesize}$, we choose the weight vector $\vw$ 
+by empirical risk minimization using logistic loss $L((\vx,y); \vw) = \ln\big(1\!+\!\exp\big(- y (\vw^{T} \vx)\big)\big)$, i.e., 
+\begin{equation}
+\vw_{\rm opt} = \arg \min\limits_{\vw \in \mathbb{R}^{2}} \underbrace{(1/\samplesize) \sum_{\sampleidx=1}^{\samplesize} L((\vx^{(\sampleidx)},y^{(\sampleidx)}); \vw)}_{=f(\mathbf{w})}.
+\end{equation} 
+Since there is no simple closed-form expression for $\vw_{\rm opt}$, we have to use some optimization method for (approximately) finding $\vw_{\rm opt}$. One extremely useful such 
+method is gradient descent which starts with some initial guess $\vw^{(0)}$ and iterates 
+\begin{equation}
+\vw^{(k+1)} = \vw^{(k)} - \alpha \nabla f(\mathbf{w}^{(k)}), 
+\end{equation}
+for $k=0,1,\ldots$. For a suitably chosen step-size $\alpha >0$ one can show that $\lim_{k \rightarrow \infty} \vw^{(k)} = \vw_{\rm opt}$. Can you find a simple closed-form expression 
+for the gradient $\nabla f(\mathbf{w}^{(k)})$ in terms of the current iterate $\vw^{(k)}$ and the data points $\dataset = \left\lbrace (x^{(\sampleidx)}, y^{(\sampleidx)}) \right\rbrace_{\sampleidx=1}^{\samplesize}$.  
+
+ 
+\noindent {\bf Answer.}\\
+By marking $t^i=\mathrm{max}(0,y^i)$ we can write the equation (\ref{eq:max_like}) as
+\begin{eqnarray}
+  \max\limits_{\vw \in \mathbb{R}^{2}}\left(\sum_{y^i=1}\mathrm{ln}(p_{y^i}) + \sum_{y^i=-1}\mathrm{ln}(1-p_{y^i})\right)&=&\min\limits_{\vw \in \mathbb{R}^{2}}-\sum_i^N\left(t^i\mathrm{ln}(p_{y^i})+(1-t^i)\mathrm{ln}(1-p_{y^i})\right),
+  \label{eq:gd1}
+\end{eqnarray}
+where $p_{y^i}$ was defined as $p_{y^i}=\frac{1}{1+\mathrm{exp}(-\vw\vx^i)}$. The derivative of $p_{y^i}$ with respect to $w_j$ can be written as $\frac{\partial p_{y^i}}{\partial w_j}=\frac{\partial p_{y^i}}{\partial (\vw\vx)}\frac{\partial (\vw\vx)}{\partial w_j} = p_{y^i}(1-p_{y^i})x_j^i$. Thus taking derivative of equation (\ref{eq:gd1}) with
+respect to $w_j$ we get for $\nabla f(w_j^k)$
+\begin{eqnarray}
+  \nabla f(w_j^k) &=&-\mu\sum_i\left(t^i\frac{1}{p_{y^i}}(1-p_{y^i})p_{y^i}x_j+(1-t^i)\frac{1}{1-p_{y^i}}(-1)p_{y^i}(1-p_{y^i})x_j\right)\nonumber\\
+  &=&-\mu\sum_i\left(t^i -t^ip_{y^i}-p_{y^i}+t^ip_{y^i}\right)x_j\nonumber\\
+  &=&-\mu\sum_i(t^i-p_{y^i})x_j.
+\end{eqnarray}
+Now the $\nabla f(w_j^k)$'s can be written in vector form as
+\begin{equation}
+  \nabla f(\mathbf{w}^k) = -\mu\left(\mathrm{max}(\mathbf{0},\vy)-\frac{1}{1+\mathrm{exp}(-\vw^{k-1} X^T)}\right)^TX,
+\end{equation}
+where $\mathrm{max}(\mathbf{0},\vy)$ is a vector of length $N$ for which the
+$j$-th element is zero if $y_i=-1$ and one if $y_i$ = 1. The matrix $X$ is a
+matrix which rows are the feature vectors $\vx^i$.
+
+  
+
+
+\newpage
+
+\section{Bayes' Classifier - I}
+Consider a binary classification problem where the goal is classify or label a webcam snapshot into ``winter'' ($y=-1$) or ``summer'' ($y=1$) based on the feature vector 
+$\vx=(x_{\rm g},1)^{T} \in \mathbb{R}^{2}$ with the image greenness $x_{\rm g}$. We might interpret 
+the feature vector and label as (realizations) of random variables, whose statistics is specified by a joint distribution $p(\vx,y)$. This joint distribution factors as $p(\vx,y) = p(\vx| y) p(y)$ 
+with the conditional distribution $p(\vx| y)$ of the feature vector given the true label $y$ and the prior distribution $p(y)$ of the label values. The prior probability $p(y=1)$ is the fraction of overall 
+summer snapshots. Assume that we know the distributions $p(\vx| y)$ and $p(y)$ and we want to construct a classifier $h(\vx)$, which classifies a snapshot with feature vector $\vx$ as $\hat{y}=h(\vx) \in \{-1,1\}$. 
+Which classifier map $h(\cdot): \vx \mapsto \hat{y}=h(\vx)$, mapping the feature vector $\vx$ to a predicted label $\hat{y}$, yields the smallest error probability (which is $p( y \neq h(\vx))$) ? 
+ 
+\noindent {\bf Answer.}\\
+The $p(\vx,y)$ can be also written as $p(\vx,y) = p(y| \vx) p(\vx)$ and thus we
+get for the posterior $p(y|\vx) = \frac{p(\vx|y)p(y)}{p(\vx)}$. Now, because
+the distribution $p(\vx|y)$ was known exactly, the classifier $\hat{y}=h(\vx)$
+that yields the smallest error probability is
+\begin{equation}
+  \hat{y}= \argmax\limits_{y \in \{-1,1\}}\frac{p(\vx|y)p(y)}{p(\vx)}.
+\end{equation}
+  
+
+\newpage
+
+\section{Bayes' Classifier - II}
+Reconsider the binary classification problem of Problem 3, where the goal is classify or label a webcam snapshot into ``winter'' ($y=-1$) or ``summer'' ($y=1$) based on the feature vector 
+$\vx=(x_{\rm g},1)^{T} \in \mathbb{R}^{2}$ with the image greenness $x_{\rm g}$. While in Problem 3 we assumed perfect knowledge 
+of the joint distribution $p(\vx,y)$ of features $\vx$ and label $y$ (which are modelled as random variables), now we consider only knowledge of the prior probability $P(y=1)$, which we denote $P_{1}$. 
+A useful ``guess'' for the distribution of the features $\vx$, given the label $y$, is via a Gaussian distribution. Thus, we assume 
+\begin{equation}
+p(\vx|y=1;\mathbf{m}_{s},\mathbf{C}_{s}) = \frac{1}{\sqrt{\det\{ 2 \pi \mathbf{C}_{s} \}}} \exp(-(1/2) (\vx\!-\!\vm_{s})^{T} \mathbf{C}_{s}^{-1} (\vx\!-\!\vm_{s})) \nonumber
+\end{equation}
+and, similarly, 
+\begin{equation}
+p(\vx|y=-1;\mathbf{m}_{w},\mathbf{C}_{w}) = \frac{1}{\sqrt{\det\{ 2 \pi \mathbf{C}_{w} \}}} \exp(-(1/2) (\vx\!-\!\vm_{w})^{T} \mathbf{C}_{w}^{-1} (\vx\!-\!\vm_{w})).  \nonumber
+\end{equation} 
+How would you choose (fit) the parameters $\mathbf{m}_{s},\mathbf{m}_{w} \in \mathbb{R}^{2}$ and $\mathbf{C}_{s},\mathbf{C}_{w} \in \mathbb{R}^{2 \times 2}$ 
+for (to) a given labeled dataset $\dataset = \{ (\vx^{(\sampleidx)},y^{(\sampleidx)}) \}_{\sampleidx=1}^{\samplesize}$.  
+
+\noindent {\bf Answer.}\\
+Because the samples ${x^{(i)}, y^{(i)}}$ are independent the parameters $\vm_s, \vm_w, \mathbf{C}_s $ and $\mathbf{C}_w$ can be obtained by
+maximizing the respective log-likelihood function with respect to the parameter. For parameters $\vm_s, \mathbf{C}_s $ the log-likelihood
+can be written as
+\begin{eqnarray}
+  \mathcal{L}_{y=1}&=&\sum_{y^i=1}\mathrm{log}(P(\vx^i|y=1;\vm_s,\mathbf{C}_s))\nonumber\\
+  &=&\sum_{y^i=1}\left(-\frac{1}{2}\mathrm{log}(2\pi^n)-\frac{1}{2}\mathrm{log}(\mathrm{det}(\mathbf{C}_s))-\frac{1}{2}(\vx-\vm_s)^T\mathbf{C}_s^{-1}(\vx-\vm_s)\right).
+\end{eqnarray}
+Now the optimal $\vm_s$ is obtained by setting the derivative of $\mathcal{L}_{y=1}$ with respect to $\vm_s$ to zero, \textit{i.e.},
+\begin{eqnarray}
+  \frac{\partial{\mathcal{L}_{y=1}}}{\partial\vm_s}&=&\mathbf{C}_s^{-1}\sum_{y^i=1}(\vx^i-\vm_s).
+  \label{eq:ms}
+\end{eqnarray}
+Setting eq. (\ref{eq:ms}) to zero and solving $\vm_s$ gives $\vm_s=\frac{\sum_{y=1}\vx^i}{N_{y=1}}$. Similarly the
+$\mathbf{C}_s$ is obtained  by setting the derivative of $\mathcal{L}_{y=1}$ with respect to $\mathbf{C}_s$ to zero giving
+\begin{eqnarray}
+  \frac{\partial{\mathcal{L}_{y=1}}}{\partial\mathbf{C}_s}&=&\sum_{y^i=1}\left(-\frac{1}{2}\mathbf{C}_s^{(-1)}+\frac{1}{2}\mathbf{C}_s^{(-1)}(\vx-\vm_s)(\vx-\vm_s)^T\mathbf{C}_s^{-1}\right).
+  \label{eq:cs}
+\end{eqnarray}
+Setting eq. (\ref{eq:cs}) to zero and solving $\mathbf{C}_s$ gives $\mathbf{C}_s=\frac{1}{N}\sum_{y^i=1}(\vx-\vm_s)(\vx-\vm_s)^T$. In equations
+(\ref{eq:ms}) and (\ref{eq:cs}) the identieties $\frac{\partial(\vx-\vs)^T\mathbf{W}(\vx-\vs)}{\partial\vs} = 2\mathbf{W}(\vx-\vs)$, $\frac{\partial\mathrm{ln}|\mathrm{det}(\mathbf{X})|}{\partial\mathbf{X}}=(\mathbf{X}^T)^{-1}$ and  $\frac{\partial\mathbf{a}^T\mathbf{X}^{-1}\vb}{\partial\mathbf{X}}=-\mathbf{X}^{-T}\mathbf{a}\vb^T\mathbf{X}^{-T}$ from matrix cook-book were used. For $\vm_w$ and $\mathbf{C}_w$ are obtained similarly by replacing the summation over $y^i=1$ to $y^i=-1$.
+
+
+\newpage
+\section{Support Vector Classifier}
+Consider data points with features $\vx^{(\sampleidx)} \in \mathbb{R}^{2}$ and labels $y^{(\sampleidx)} \in \{-1,1\}$. 
+In the figures below, the data points with $y^{(\sampleidx)}=1$ are depicted as red crosses 
+and the data points with  $y^{(\sampleidx)}=-1$ are depicted as blue filled circles. 
+Which of the four figures depicts a decision boundary which could have been generated by a SVC. Justify your selection.
+	
+	\begin{figure}[ht!]
+		\begin{center}
+			\subfigure[]{%
+				\includegraphics[width=0.2\textwidth]{SVM_1.PNG}
+			}%
+			\subfigure[]{%
+				\includegraphics[width=0.2\textwidth]{SVM_2.PNG}
+			}
+			\subfigure[]{%
+				\includegraphics[width=0.2\textwidth]{SVM_3.PNG}
+			}%
+			\subfigure[]{%
+				\includegraphics[width=0.2\textwidth]{SVM_4.PNG}
+			}
+		\end{center}
+	\end{figure}
+\noindent {\bf Answer.}
+
+\end{document}
