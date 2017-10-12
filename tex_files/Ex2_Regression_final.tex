@@ -365,8 +365,22 @@ the original feature $x$ into a modified feature vector ${\bm \phi}(x)=(\phi_{1}
 ${\bm \phi}(x)$ to predict the label $y$ using the predictor $h^{(\mathbf{w})}(x) = \mathbf{w}^{T} {\bm \phi}(x)$ with some weight vector $\mathbf{w}\in \mathbb{R}^{n}$. 
 Note that the so defined predictor $h^{(\mathbf{w})}$ is linear only w.r.t.\ the high-dimensional features ${\bm \phi}(x)$, but typically 
 a non-linear function of the original feature $x$. Is there a feature map ${\bm \phi}$ such that for any hypothesis $h^{*}(\cdot)$, which satisfies \eqref{equ_properties_hypo}, 
-there is always a weight vector $\mathbf{w}_{0} \in \mathbb{R}^{n}$ such that $|h^{(\mathbf{w}_{0})}(x) - h^{*}(x)| \leq 10^{-3}$ for all $x \in \mathbb{R}$?
+there is always a weight vector $\mathbf{w}_{0} \in \mathbb{R}^{n}$ such that $|h^{(\mathbf{w}_{0})}(x) - h^{*}(x)| \leq 10^{-3}$ for all $x \in \mathbb{R}$?\\
 
-\noindent {\bf Answer:}
+\noindent {\bf Answer:}\\
+According to Weierstrass theorem any continuous fuction on closed interval can
+be approximated with arpitrary precision using polynomial of degree $n$. Because
+$h^*$ is clearly continuous on interval $x\in\lbrack 0,10\rbrack$ we can
+approximate it with polynomial of degree $n$ which satifies
+$|P^n(x)-h^*(x)|<\mathrm{10^{-3}}$ for any $x\in\lbrack 0,10\rbrack$. Defining a pice-wise function $f(x)$ that
+satisifies $f(x)=1, x \in\lbrack 0,10\rbrack$ and $f(x)=0$ otherwise, we can
+write the feature map $\phi(x)$, that satisifies  $|\phi(x)-h^*(x)|<\mathrm{10^{-3}}$ for all
+$x \in \mathbb{R}$, as
+\begin{equation}
+  \phi(x)=(a_0f(x),a_1f(x)x,a_2f(x)x^2,\ldots,a_nf(x)x^n),
+  \label{eq:feature_map}
+\end{equation}
+where coefficients $a_0, a_1,\ldots, a_n$ are the coefficients of the polynomial
+expansion.
 \end{document}
 
