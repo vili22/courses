@@ -1,0 +1,248 @@
+\documentclass[article,11pt]{article}
+
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx,subfigure}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{ctable}
+\usepackage{subfig}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{bm, amssymb}
+\renewcommand*{\thesection}{Problem~\arabic{section}:}
+\renewcommand{\labelenumi}{(\alph{enumi})}
+\input{mlbp17_macros}
+
+% add to macros
+\newcommand{\mC}[0]{{\bf C}}
+\usepackage[bottom=0.25in, top=0.15in]{geometry}
+
+
+\title{CS-E3210- Machine Learning Basic Principles \\
+	Home Assignment - ``Validation"}
+\begin{document}
+\date{}
+%\author{by Stefan Mojsilovi? and Alex Jung}
+\maketitle
+
+Your solutions to the following problems should be submitted as one single pdf which does not contain 
+any personal information (student ID or name).  The only rule for the layout of your submission is that for each 
+problem there has to be exactly one separate page containing the answer to the problem. You are welcome to use the \LaTeX-file underlying this pdf, 
+available under \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public}, and fill in your solutions there. 
+
+%For the problems requiring K-fold cross validation, please see the following link: \url{https://www.cs.cmu.edu/~schneide/tut5/node42.html} for a simple, yet effective explanation.
+
+
+
+\newpage
+
+\section{The Training Error is not the Generalization Error}
+Consider a folder $\dataset = \{\vz^{(1)},...,\vz^{(\samplesize)}\}$ constituted by $\samplesize$ webcam snapshots $\vz^{(\sampleidx)}$, each 
+characterizd by the features $\vx^{(\sampleidx)} \in \mathbb{R}^\featuredim$ and labeled by the local temperature $\target^{(\sampleidx)}\in \mathbb{R}$ 
+during the snapshot.  We would like to find out how to predict the temperature based solely from the feature vector $\vx$. 
+To this end, we will use linear predictors of the form: $h^{(\vw)}(\vx) = \vw^{T} \vx$ with some weight vector $\mathbf{w} \in \mathbb{R}^{d}$. 
+
+Let us assume that the features $\vx$ and label $y$ are related by a simple linear regression model: 
+\vspace*{-2mm}
+\begin{equation}
+\target = \bar{\vw}^{T} \vx +\varepsilon
+\vspace*{-1mm}
+\end{equation}
+with some non-random weight vector $\bar{\vw} \in \mathbb{R}^{\featuredim}$ and random noise $\varepsilon$. 
+We assume that the feature vector and noise are jointly normal with zero mean and covariance matrix $\mathbf{C}$, i.e., $(\vx^{T},\varepsilon)^{T} \sim \mathcal{N}(\mathbf{0},\mathbf{C})$.
+%The noise $\varepsilon^{(\sampleidx)}$ is independent of the features $\vx^{(\sampleidx)}$. 
+The feature vectors $\vx^{(\sampleidx)}$ and labels $y^{(\sampleidx)}$ are independent and identically distributed (i.i.d.) realizations of $\vx$ and $\target$. 
+% $\left( \vx^{(\sampleidx)}\right)$ and $\left( \varepsilon^{(\sampleidx)}\right)$ to be i.i.d. with covariance matrix $\mC \in \mathbb{R}^{(\featuredim+1) \times (\featuredim+1)}$. 
+
+
+\begin{enumerate}
+\item Consider the predictor $h^{(\mathbf{w})}(\mathbf{x})= \mathbf{w}^{T} \mathbf{x}$ for a particular fixed weight vector $\mathbf{w}\in \mathbb{R}^{d}$. 
+What is the relation between the empirical risk (training error):
+
+\begin{equation}
+\emperror \left( \vw | \dataset\right)   \defeq \frac{1}{N} \sum_{\sampleidx=1}^{N} \left( \target^{(\sampleidx)} -  \vw^{T} \vx^{(\sampleidx)}\right) ^2 \nonumber
+\vspace*{-1mm}
+\end{equation}
+and the generalization error
+
+\begin{equation}
+\generror \left( \vw \right)= \expect \{ (\target - \vw^{T} \vx)^2\}? \nonumber
+\end{equation}
+
+\item Find a closed-form expression for the generalization error which involves the true 
+(but unknown) weight vector $\bar{\vw}$ and covariance matrix $\mC$.
+
+\item According to your results in (b), how should we choose the weight vector $\vw$ 
+such that the predictor $h^{(\mathbf{w})}$ has small generalization error?
+
+%\item Is the optimal training error $\emperror \left( \vw_0 | \dataset\right) $ an unbiased estimate of the generalization error?
+\end{enumerate}
+
+\noindent{\bf Answer.}
+
+\newpage
+
+\section{Overfitting in Linear Regression}
+Consider the problem of predicting a real-valued label (target) $y \in \mathbb{R}$ based on the features $\vx \in \mathbb{R}^{d}$. 
+Given a labeled dataset $\dataset$ consisting of $\samplesize$ labeled data points with feature vectors $\vx^{(i)} \in \mathbb{R}^d$ and labels 
+$\target^{(\sampleidx)}\in \mathbb{R}$, we learn a linear predictor $h^{(\vw)}\left( \vx\right) = \vw^{T} \vx$ by minimizing the 
+empirical risk: 
+\[
+\emperror(h^{(\vw)}(\cdot) | \dataset) \defeq  \frac{1}{\samplesize}\sum^{\samplesize}_{\sampleidx=1}(y^{(\sampleidx)} - h^{(\vw)}(\vx^{(\sampleidx)}))^2
+= \frac{1}{\samplesize}\sum^{\samplesize}_{\sampleidx=1}(y^{(\sampleidx)} - \vw^{T} \vx^{(\sampleidx)})^2.
+\]
+\noindent
+If the dataset $\dataset$ is small compared to the number $d$ of features, i.e., $\samplesize \leq d$, 
+the feature vectors $\{ \vx^{(\sampleidx)} \}_{\sampleidx=1}^{\samplesize}$ are typically linearly independent. 
+Show that in this case, there exists a weight vector $\vw_0$ so that $\emperror(h^{(\vw_0)}(\cdot) | \dataset)=0$.
+
+\noindent{\bf Answer.}\\
+The solution to minimization problem can be written in matrix as $\mathbf{X}\vw=\vy$ where the rows of the matrix $\mathbf{X}$ are the features $\vx^i$. This
+can be further written in form $\mathbf{X}'\vw'=0$ where $\mathbf{X}'=\lbrack\mathbf{X}, -\vy\rbrack$ is a $N\times (d+1)$ matrix and
+$\vw'=\lbrack\vw,1\rbrack^T$. Because the feature vectors were considered to
+be independent the rank of matrix $\mathbf{X}'$ is $N$ and thus there are
+$d+1-N$ dependent columns in $\mathbf{X}'$ and the $\mathbf{X}'$ can be written
+as $\mathbf{X'}=\lbrack\mathbf{A}, \mathbf{A}\mathbf{B}\rbrack$ where
+$\mathbf{A}$ is a $N\times N$ matrix and $\mathbf{B}$ is a $N\times(d+1-N)$
+matrix. Now the solution to $\mathbf{X}'\vw'=0$ can be written as $\vw' =
+\lbrack\mathbf{-B},\mathbf{I}\rbrack^T$. where $\mathbf{I}$ is a $(d+1-N)\times(d+1-N)$ identity matrix. Now any linear combination of columns of $\vw'$ is a
+solution to $\mathbf{X'}\vw'=0$ and thus $\vw_0$ is obtained also as linear combinations of those columns and removing the last element.
+
+
+\newpage
+
+\section{Probability of Sampling Disjoint Datasets}
+Consider a dataset $\dataset$ which contains $\samplesize\!=\!10$ different labeled webcam snapshots. We then create a 
+training dataset $\dataset^{(\rm train)}$ by copying $3$ randomly selected elements of $\dataset$. Moreover, we create 
+a validation dataset $\dataset^{(\rm val)}$ by copying another $2$ randomly selected elements of $\dataset$. 
+What is the probability that the training set and the validation set are disjoint, i.e., they have no snapshot in common?
+
+\noindent{\bf Answer.}\\
+For disjoint training and validation sets the training set can be chosen in
+$\binom{10}{3}$ ways and then the disjoint validation set in $\binom{7}{2}$ way resulting in total $\binom{10}{3}\binom{7}{2}$ ways. Number of all
+possible ways to select training and validation sets is $\binom{10}{3}\binom{10}{2}$ and thus the probalitiy that the sets are disjoint is
+\begin{equation}
+  P=\frac{\binom{10}{3}\binom{7}{2}}{\binom{10}{3}\binom{10}{2}}=\frac{\binom{7}{2}}{\binom{10}{2}},
+\end{equation}
+which is approximately 0.45 .
+
+\newpage
+\section{The Histogram of the Prediction Error} \label{problem 2}
+
+Consider the dataset $\dataset$ available at \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public/tree/master/Validation/p3data}. 
+For your convenience, this dataset is already split into a training dataset $\dataset^{(\rm train)}= \{ (\vx^{(\sampleidx)},y^{(\sampleidx)})\}_{\sampleidx=1}^{\samplesize^{(\rm train)}}$ 
+(features $\vx^{(\sampleidx)} \in \mathbb{R}^{5}$ stored in the file ``\texttt{X\_train.txt}'', labels $y^{(\sampleidx)} \in \mathbb{R}$ stored in ``\texttt{y\_train.txt}'') 
+and the validation dataset $\dataset^{(\rm val)}$ (stored in the files ``\texttt{X\_validation.txt}'' and  ``\texttt{y\_validation.txt}''). 
+%Each line of these files contains a feature vector $\vx^{(\sampleidx)} \in \mathbb{R}^d$ (``\texttt{X\_validation.txt}'') and a label $\target^{(\sampleidx)}\in \mathbb{R}$, respectively. 
+We want to predict the label $\target$ given the features $\vx$ using a linear predictor $h^{(\vw)}(\vx)=\vw^{T} \vx$.
+
+\begin{enumerate}
+	\item %Select a training dataset $\dataset^{(\rm train)}$ by randomly selecting $\samplesize^{(\rm train)}$ data points $(\vx^{(\sampleidx)},y^{(\sampleidx)})$ and 
+	Learn a linear predictor $h^{(\vw)}(\vx)=\vw^{T} \vx$ by choosing the weight vector $\mathbf{w}$ such that the empirical risk (using squared error loss)
+\begin{equation} 
+\emperror \big( h^{(\vw)}(\cdot)| \dataset^{(\rm train)} \big) = (1/|\dataset^{(\rm train)}|) \sum_{(\vx,y) \in \dataset^{(\rm train)}} (y - h^{(\vw)}(\vx))^{2}   \nonumber
+\end{equation} 
+obtained for the training dataset $\dataset^{(\rm train)}$ is as small as possible. Denote this optimal weight vector by $\vw_{\rm opt}$.
+	\item Select a test set $\dataset^{(\rm test)}$ by copying $\samplesize^{(\rm test)}= 10$ randomly selected 
+	data points $(\vx^{(\sampleidx)},y^{(\sampleidx)})$ out of the validation dataset $\dataset^{(\rm val)}$. 
+	Evaluate the prediction error of $h^{(\vw_{\rm opt})}$ by computing the empirical risk 
+\begin{equation} 
+\emperror \big( h^{(\vw_{\rm opt})}(\cdot)| \dataset^{(\rm test)} \big) = (1/|\dataset^{(\rm test)}|) \sum_{(\vx,y) \in \dataset^{(\rm test)}} (y - h^{(\vw_{\rm opt})}(\vx))^{2}   \nonumber
+\end{equation} 	
+	obtained for the test dataset $\dataset^{(\rm test)}$.
+	\item Repeat step (b) $K = 100$ times, involving another test dataset  $\dataset^{(\rm test)}$ each time due to randomness, 
+	and generate a histogram of the prediction error. In view of the obtained histogram, is it a good idea to evaluate the 
+	error only for one single test dataset ?  
+%	\item Discuss the prediction error and its uncertainty (use appropriate point and interval estimates).
+\end{enumerate}
+	
+\noindent {\bf Answer. (a)}The optimal weight vector $\vw_\mathrm{opt}$ is obtained using the basic least squares solution which gives $\vw_\mathrm{opt}=(-0.18298954, -0.18298954, 1.51048792, 0.84094088, 0.1355004,0.43844228)$, where the first element is the constant term.\\
+
+\noindent {\bf (b)}The prediction error obtained using the above $\vw_\mathrm{opt}$ and ten random samples is 0.21 .\\
+
+\noindent {\bf (c)}The generated histogram is shown in figure \ref{fig:prediction_error}. According to histogram evaluating error based on only single set may
+easily under- or overestimate the true error.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.5\linewidth]{Ex4_4.eps}
+  \caption{Histogram of prediction error corresponding to 100 samples}
+  \label{fig:prediction_error}
+\end{figure}
+
+
+\newpage
+\section{K-fold Cross Validation}
+
+Consider a dataset $\dataset = \{ (\vx^{(\sampleidx)},y^{(\sampleidx)}) \}_{\sampleidx=1}^{\samplesize}$ containing a total of $\samplesize=20$ snapshots 
+(''winter??.jpg'' or ''autumn??.jpg'' available at \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public/tree/master/Validation/WinterFall}) 
+which are either taken either during winter ($y^{(\sampleidx)}=-1$) or autumn ($y^{(\sampleidx)}=1$) 
+. 
+We aim at finding a classifier which classifies an image as ``winter'' ($\hat{y}=-1$) if $h^{(\mathbf{w})}(\mathbf{x}) = \sigma(\mathbf{w}^T \mathbf{x}) <1/2$ or 
+as ``autumn''  ($\hat{y}=1$) if $h^{(\mathbf{w})}(\mathbf{x}) = \sigma(\mathbf{w}^T \mathbf{x}) \geq 1/2$. 
+Let us collect the image pixels $i$ which belong to the top-left square of size 
+$r \times r$ pixels by $\mathcal{R}_{r}$. For a given model size $r$, define the hypothesis space 
+\begin{equation}
+\hypospace^{(r)} \defeq \{ h^{(\mathbf{w})}(\mathbf{x}) = \sigma(\mathbf{w}^T \mathbf{x}) \mbox{, with } w_{i} = 0 \mbox{ for } i \notin \mathcal{R}_{r} \}.  \nonumber
+\end{equation} 
+%Denote by $\dataset_r$ dataset which consists 
+In order to find the best choice for $r$, we will use ``K-fold cross validation'' (with $K=5$) in order to assess the quality of the hypothesis space 
+$\hypospace^{(r)}$ for each $r \in \left\lbrace 1,10,20,50,100,200  \right\rbrace $. 
+This works as follows: 
+\begin{itemize}
+\item step 1:  randomly partition the dataset $\dataset$ into $K=5$ equal-size subsets $\dataset^{(1)},\ldots,\dataset^{(K)}$. 
+\item step 2:  choose one of the subsets $\dataset^{(t)}$ as validation set 
+\item step 3:  choose the remaining subsets as the training set $\dataset^{(\rm train),t} = \dataset \setminus \dataset^{(t)}$ 
+\item step 4:  find optimal classifier $h^{(\vw_{\rm opt,t})}(\cdot) \in \hypospace^{(r)}$ which minimizes empirical risk 
+\begin{equation} 
+\emperror \{ h^{(\vw)} | \dataset^{(\rm train),t} \} = (5/\samplesize) \sum_{(\vx,y) \in \dataset^{(\rm train),t}}  \loss{(\vx,y)}{h^{(\vw)}(\cdot)}  \nonumber%, over the training data $$
+\end{equation} 
+using logistic loss $\loss{(\vx,y)}{h^{(\vw)}(\cdot)}=\ln\big(1 + \exp\big(- y (\vw^{T} \vx)\big))\big)$. 
+You might use gradient descent for determining the optimal weight vector $\vw_{\rm opt,t}$. (see HA3) 
+\item step 5:  compute validation error $\emperror \{ h^{(\vw_{\rm opt,t})} | \dataset^{(t)} \}$ 
+\item step 6: repeat from step 2 until every subset $\dataset^{(t)}$ has been used exactly once for validation 
+\item step 7: compute the average training error $E^{(\rm train)}(r) = (1/5) \sum\limits_{t=1}^{5} \emperror \{ h^{(\vw_{\rm opt,t})} | \dataset^{(\rm train),t} \}$ 
+and the average validation error $E^{(\rm val)}(r) = (1/5) \sum\limits_{t=1}^{5} \emperror \{ h^{(\vw_{\rm opt,t})} | \dataset^{(t)} \}$
+\end{itemize} 
+
+Implement this procedure for each choice $r \in \left\lbrace 1,10,20,50,100,200  \right\rbrace $.  
+Plot the average training error $E^{(\rm train)}(r)$ and the average validation error $E^{(\rm val)}(r)$ 
+as functions of the model complexity $r$. What is the best model complexity for the classification problem at hand? Justify your answer.
+
+\noindent {\bf Answer.}The average of training and validation errors for different model complexities is shown in figure \ref{fig:model_complexity}. According
+to figure \ref{fig:model_complexity} the best choice for model complexity is
+$r=50$ because for higher model complexities $r$ the average validation error
+only slightly improves while the comptutational cost increases rapidly.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.3\linewidth]{Ex4_5.eps}
+  \caption{Average of training and validation error for model complexities
+    $r=1$ (red), $r=10$ (green), $r=20$ (blue), $r=50$ (magenta), $r=100$ (cyan), $r=200$ (black)}
+  \label{fig:model_complexity}
+\end{figure}
+
+%\newpage
+%\section{K-fold Cross Validation II - Polynomial Regression }
+%
+%Consider a dataset $\dataset$ which contains $\samplesize\!=\!20$ webcam snapshots with filename 
+%``Sunset (*$\sampleidx$*).png'', $\sampleidx=1,\ldots,\samplesize$, available at \url{https://version.aalto.fi/gitlab/MLBigData/MLBP2017/tree/Stefan_ValidationEX/Ex4_Validation/Sunset}. 
+%(TODO Change the link when merging with the master) Determine for each snapshot the polynomial feature vector $\vx^{(\sampleidx)}={(x_{\rm l}^{(\sampleidx)}}^{0}, {x_{\rm l}^{(\sampleidx)}}^{1},...,{x_{\rm l}^{(\sampleidx)}}^{k}) \in \inspace (= \mathbb{R}^{k+1})$ with the normalized (use standard score) total light intensity $x_{\rm l}^{(\sampleidx)}$ of an image. The total light intensity of a pixel is calculated by summing its red, green and blue values. 
+%Moreover, determine for each snapshot the label $y^{(\sampleidx)} \in \outspace (=\mathbb{R})$ given that we know that the snapshots were taken with constant intervals of time between them.
+%
+% Now, we are interested in finding the best model for the problem at hand given the model class: $h^{\vw}\left( \vx_r\right) = \vw^{T} \vx$, where $\vx$ is a feature vector in $\inspace$ and $\vw \in \mathbb{R}^{\featuredim}$, with varying maximum polynomial degree $k \in \left\lbrace 1,2,...,\featuredim-1 \right\rbrace$. A standard way of doing that is by performing K-fold Cross Validation.
+%
+%\begin{enumerate}
+%	\item Use the regularized linear regression gradient descent method that you have developed in the 
+%	Home Assignment 2 to train and validate your model. Try various polynomial degrees (eg. from 0 to 9) 
+%	and try various values for the regularisation parameter (eg. [0, 0.1, 1, 10]). For K-fold Cross Validation use 5 folds.
+%	\item Plot the training error and the validation error as functions of the maximum polynomial degree $k$ 
+%	in the feature vector for various values of the regularization parameter $\lambda$ that you have used.
+%	\item What are the best parameters $\lambda$ and $k$ for the problem? Justify your answer.
+%	\item For the best parameters plot the model as a continuous line along with the data ($y^{(\sampleidx)}$ vs. $x_l^{(\sampleidx)}$) as a scatter plot.
+%\end{enumerate}
+%
+%\noindent {\bf Answer.}
+
+\end{document}

@@ -90,16 +90,16 @@ By marking $t^i=\mathrm{max}(0,y^i)$ we can write the equation (\ref{eq:max_like
 where $p_{y^i}$ was defined as $p_{y^i}=\frac{1}{1+\mathrm{exp}(-\vw\vx^i)}$. The derivative of $p_{y^i}$ with respect to $w_j$ can be written as $\frac{\partial p_{y^i}}{\partial w_j}=\frac{\partial p_{y^i}}{\partial (\vw\vx)}\frac{\partial (\vw\vx)}{\partial w_j} = p_{y^i}(1-p_{y^i})x_j^i$. Thus taking derivative of equation (\ref{eq:gd1}) with
 respect to $w_j$ we get for $\nabla f(w_j^k)$
 \begin{eqnarray}
-  \nabla f(w_j^k) &=&-\mu\sum_i\left(t^i\frac{1}{p_{y^i}}(1-p_{y^i})p_{y^i}x_j+(1-t^i)\frac{1}{1-p_{y^i}}(-1)p_{y^i}(1-p_{y^i})x_j\right)\nonumber\\
-  &=&-\mu\sum_i\left(t^i -t^ip_{y^i}-p_{y^i}+t^ip_{y^i}\right)x_j\nonumber\\
-  &=&-\mu\sum_i(t^i-p_{y^i})x_j.
+  \nabla f(w_j^k) &=&-\sum_i\left(t^i\frac{1}{p_{y^i}}(1-p_{y^i})p_{y^i}x_j+(1-t^i)\frac{1}{1-p_{y^i}}(-1)p_{y^i}(1-p_{y^i})x_j\right)\nonumber\\
+  &=&-\sum_i\left(t^i -t^ip_{y^i}-p_{y^i}+t^ip_{y^i}\right)x_j\nonumber\\
+  &=&-\sum_i(t^i-p_{y^i})x_j.
 \end{eqnarray}
 Now the $\nabla f(w_j^k)$'s can be written in vector form as
 \begin{equation}
-  \nabla f(\mathbf{w}^k) = -\mu\left(\mathrm{max}(\mathbf{0},\vy)-\frac{1}{1+\mathrm{exp}(-\vw^{k-1} X^T)}\right)^TX,
+  \nabla f(\mathbf{w}^k) = -\left(\mathrm{max}(\mathbf{0},\vy)-\frac{1}{1+\mathrm{exp}(-\vw^{k-1} X^T)}\right)^TX,
 \end{equation}
 where $\mathrm{max}(\mathbf{0},\vy)$ is a vector of length $N$ for which the
-$j$-th element is zero if $y_i=-1$ and one if $y_i$ = 1. The matrix $X$ is a
+$i$-th element is zero if $y_i=-1$ and one if $y_i$ = 1. The matrix $X$ is a
 matrix which rows are the feature vectors $\vx^i$.
 
   
