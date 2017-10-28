@@ -1,0 +1,99 @@
+\documentclass[article,11pt]{article}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx,subfigure}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{ctable}
+\usepackage{subfig}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{bm, amssymb}
+\usepackage{subfigure}
+\renewcommand*{\thesection}{Problem~\arabic{section}:}
+\renewcommand{\labelenumi}{(\alph{enumi})}
+\newcommand{\cluster}{\mathcal{C}}
+
+\input{mlbp17_macros}
+
+\title{CS-E3210- Machine Learning Basic Principles \\ Home Assignment 5 - ``Clustering''}
+\begin{document}
+\date{}
+\maketitle
+
+Your solutions to the following problems should be submitted as one single pdf which does not contain 
+any personal information (student ID or name).  The only rule for the layout of your submission is that for each 
+problem there has to be exactly one separate page containing the answer to the problem. You are welcome to use the \LaTeX-file underlying this pdf, 
+available under \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public}, and fill in your solutions there. 
+
+\newpage
+
+\section{Hard Clustering}
+Consider $\samplesize=20$ snapshots, available at \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public/tree/master/Clustering/images}, 
+which are named according to the season when they have been taken, i.e., either ``winter??.jpeg'' or ``summer??.jpeg''. 
+We represent the $i$th snapshot, with $i=1,\ldots,\samplesize$, by the feature vector $\vx^{(\sampleidx)}=(x^{(\sampleidx)}_{\rm r},x^{(\sampleidx)}_{\rm g})^{T} \in \mathbb{R}^{2}$ with the total image 
+redness $x_{\rm r}$ and greenness $x_{\rm g}$. Thus, the overall dataset is given by the feature vectors $ \{ \vx^{(\sampleidx)} \}_{\sampleidx=1}^{\samplesize}$, 
+which are divided into two subsets $\dataset^{(\rm summer)}$ and $\dataset^{(\rm winter)}$, which contain only the feature vectors of summer or winter snapshots, respectively. 
+Apply the k-means algorithm, using a fixed number of $M$ iterations, for clustering the dataset $\dataset= \{ \vx^{(\sampleidx)} \}_{\sampleidx=1}^{\samplesize}$ 
+into two non-overlapping clusters $\mathcal{C}_{0}$, $\mathcal{C}_{1}$ such that each snapshot belongs exactly to one of the clusters $\mathcal{C}_{0}$ and $\mathcal{C}_{1}$. 
+Let us characterize the ``quality'' of the clusters by how well they separate winter from summer images. To this end, we define the ``purity'' measure  
+$P_{\rm w}= h \big( \frac{| \cluster_{1} \cap \dataset^{(\rm winter)}|}{| \dataset^{(\rm winter)} |}\big)$ and $P_{\rm s}= h \big( \frac{| \cluster_{1} \cap \dataset^{(\rm summer)}|}{| \dataset^{(\rm summer)} |}\big)$ 
+with the function $h(p) = 1 + p \log_{2} p + (1-p) \log_{2} (1-p)$. The average purity obtained from the k-means output is then $\bar{P} = (1/2) ( P_{\rm w} +  P_{\rm s} )$. 
+Implement the k-means algorithm using different numbers $M$ of iterations and plot the average purity $\bar{P}$ obtained for different values of $M$. 
+For each choice of $M$, repeat the application of k-means several (say 10) times (runs), and use for each run two (independently) randomly selected feature vectors $\vx^{(i)},\vx^{(j)} \in \dataset$ as 
+the initial choices for the cluster means $\vm_{0}$ and $\vm_{1}$. Average the results of the different runs to get one single estimate of $\bar{P}$ for each $M$. 
+ 
+\noindent {\bf Answer.}\\
+Iteration numbers ranging from 1 to 15 was used and for each
+iteration number ten different random initialization points for two
+cluster means was used. For each random initialization the purity
+measure was calculated and then averaged over all the ten random
+initializations. The resulting plot showing the average purity
+measure as a function of number of iterations is shown in figure
+\ref{fig:plot1}.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.6\linewidth]{Ex5_1.eps}
+  \caption{Average of purity measure with respect to number of
+    iterations.}
+  \label{fig:plot1}
+\end{figure}
+
+\newpage
+
+\section{Soft Clustering}
+Redo Problem 1 using, instead of the hard clustering algorithm k-means, 
+the soft clustering algorithm discussed in Lecture 9 (cf.\ slide 35 in \url{https://version.aalto.fi/gitlab/junga1/MLBP2017Public/blob/master/Clustering/mlbp17_Clustering_v1.pdf}). 
+We run this soft clustering algorithm for a fixed number $M$ of iterations to obtain, for each 
+snapshot, the degree $y^{(\sampleidx)}$ to which the $i$th snapshot belongs to $\cluster_{1}$.  
+A reasonable adaption of the purity measure of Problem 1 to the soft clustering setting is to use\footnote{For an index $i \in \{1,\ldots,\samplesize\}$, with a slight abuse of notation, 
+we write $i \in \dataset^{(\rm winter)}$ if the $i$th feature vector $\vx^{(i)}$ represents 
+a winter image, i.e., $\vx^{(i)} \in \dataset^{(\rm winter)}$.} is  $P_{\rm w}= h \big( (2/\samplesize) \sum_{\sampleidx \in \dataset^{(\rm winter)}} y^{(\sampleidx)} \big)$ and 
+$P_{\rm s}= h \big( (2/\samplesize) \sum_{\sampleidx \in \dataset^{(\rm summer)}} y^{(\sampleidx)} \big)$ for computing the average purity $\bar{P} = (1/2) ( P_{\rm w} +  P_{\rm s} )$.  Implement the soft clustering algorithm 
+using different numbers $M$ of iterations and plot the average purity $\bar{P}(M)$ as a function of the number of iterations $M$. 
+%Since the output of the soft clustering algorithm depends on the initial choice for the cluster means $\vm_{0}$, $\vm_{1}$ 
+%and cluster covariance matrices $\mathbf{C}_{0}$ and $\mathbf{C}_{1}$ (cf. slides of Lecture 9), it is a good idea to run, 
+For each choice of $M$, use two (independently) randomly selected feature vectors $\vx^{(i)}, \vx^{(j)} \in \dataset$ 
+as the initial cluster means $\vm_{0}$ and $\vm_{1}$. Initialize the covariance matrices with the identity matrix, i.e., $\mathbf{C}_{0} = \mathbf{C}_{1} = \mathbf{I}$. 
+Average the results obtained from these runs to get one single estimate of $\bar{P}(M)$ for each $M$. 
+
+
+ 
+\noindent {\bf Answer.}\\
+Similar calculations as in previous section were performed, but instead of
+using hard clusterin a soft clusterin algorithm was used. The resulting plot
+showing the average purity measure as a function of number of iterations is
+shown in figure \ref{fig:plot2}. According to figure \ref{fig:plot2} the cluster
+means do not proberly converge to any definite value with different
+initialization and thus the impurity measure fluctuates between different number
+of iterations used.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.6\linewidth]{Ex5_2.eps}
+  \caption{Average of purity measure with respect to number of
+    iterations.}
+  \label{fig:plot2}
+\end{figure}
+\end{document}

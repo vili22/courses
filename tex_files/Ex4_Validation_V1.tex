@@ -213,11 +213,13 @@ as functions of the model complexity $r$. What is the best model complexity for 
 
 \noindent {\bf Answer.}The average of training and validation errors for different model complexities is shown in figure \ref{fig:model_complexity}. According
 to figure \ref{fig:model_complexity} the best choice for model complexity is
-$r=50$ because for higher model complexities $r$ the average validation error
-only slightly improves while the comptutational cost increases rapidly.
+$r=50$ because for higher model complexities $r$ there is only a small
+improvement in average validation error and occasionally the validation error
+might get even larger while the computational complexity increases
+significantly.
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.3\linewidth]{Ex4_5.eps}
+  \includegraphics[width=0.6\linewidth]{Ex4_5.eps}
   \caption{Average of training and validation error for model complexities
     $r=1$ (red), $r=10$ (green), $r=20$ (blue), $r=50$ (magenta), $r=100$ (cyan), $r=200$ (black)}
   \label{fig:model_complexity}
