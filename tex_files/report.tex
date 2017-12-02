@@ -14,6 +14,10 @@
 \usepackage{epsfig}
 \usepackage{epstopdf}
 \usepackage{amsmath}
+\usepackage{blkarray}
+\usepackage{multirow}
+\usepackage{mathtools}
+\usepackage[font=small,labelfont=bf]{caption}
 \input{mlbp17_macros}
 
 %\usepackage{subfig}
@@ -24,24 +28,23 @@
 %\setlength{\parindent}{0mm}
 %\setlength{\parskip}{3mm plus0.5mm minus0.5mm}
 \bibliographystyle{apsrev4-1}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
 \title{Logistic regression and Bayes-classifier study of classification of
   songs to genres based on timbre, pitch and rhythm of the music signal }
 \date{\today}
-\author{Ville Virkkala}
+\author{John Doe}
 \affiliation{Aalto University, P.O. Box 11100,
 FI-00076 Aalto, Finland}
 
 \begin{abstract}
   A genre of a song can be estimated based on its music signal's
-  characteristics . In this work we use two linear classifiers, Bayes Classifer
-  and Logistic classifer, to classify songs into one of ten possible genres. The
-  two classifers are trained against the training data and their performance is
+  characteristics . In this work we use two classifiers, Bayes Classifier
+  and Logistic classifier, to classify songs into one of ten possible genres. The
+  two classifiers are trained against the training data and their performance is
   compared against each other. In this work we show that both classifiers
-  perform much better compared to random guess. However their cabability to
+  perform much better compared to random guess. However their capability to
   classify all songs is clearly limited the accuracy for both classifiers being
   around 60\%.
 \end{abstract}
@@ -59,14 +62,14 @@ music transcription problem. However even today an expert human musician often
 beats a state-of-the-art automatic transcription system in accuracy.
 
 Characteristics of music signal that are useful in classification of a song
-are \textit{timbre}, \textit{rhytm}, \textit{pitch}, \textit{loudness} and
+are \textit{timbre}, \textit{rhythm}, \textit{pitch}, \textit{loudness} and
 \textit{duration}\cite{musictranscription} from which the three first one,
-descriped below are used in this work.
+described below are used in this work.
 \begin{itemize}  
 \item The timbre of the music can be most easily described as the factor
   which separates two sources of music from each other. For example if the same
-  song is played by violin or a quitar the timbre is called the characted which
-  separates the violin from the quitar.
+  song is played by violin or a guitar the timbre is called the character which
+  separates the violin from the guitar.
 \item The pitch is related to frequency scale of a song a can be defined as the
   frequency of the sine-wave fitted to target sound by human listener.
 \item The rhythm of the music can be described as arrangement of sounds as time
@@ -78,20 +81,20 @@ on it's characteristics called features. A linear classifier does the
 classification by making a linear combination of the features and converting
 the resulting value into a class or a probability that the object belongs to
 given class. In logistic regression the feature vector of the object is
-transformed into a probality by taking a linear compination of features and
+transformed into a probality by taking a linear combination of features and
 mapping the result into interval $\lbrack 0, 1\rbrack$ using a sigmoid function.
-The Bayes-classifier incontrast assumes that the feature vector is drawn from a
-multidimensional-gaussian distribution. The posterior probalility of the object
+The Bayes-classifier in contrast assumes that the feature vector is drawn from a
+multidimensional-Gaussian distribution. The posterior probability of the object
 belonging to a certain class is then obtained as a product of the prior of the
-class and the probability of to sample the given feature vector from it
-multidimensional gaussian distribution.
+class and the probability to sample the given feature vector from the
+multidimensional Gaussian distribution.
 
 The paper is organized as follows. The used data-set and the computational
 methods are described in detail in Sec. \ref{sec:methods}. In Sec.
 \ref{sec:results} the results for the both logistic regression- and
 Bayes-classifier are given. Sec. \ref{sec:conclusions} is a
-summary of the results and the differences between the two classfiers are
-discusssed.
+summary of the results and the differences between the two classifiers are
+discussed.
 
 \section{Used data-set and computational methods}
 \label{sec:methods}
@@ -105,7 +108,7 @@ different categories. The gatecories were: 1 Pop Rock, 2 Electronic, 3 Rap,
 The musical characteristics of the songs were packed to a feature
 vector of length 256. The first 48 elements in the feature vector can be
 associated to timbre, the next 48 elements to pitch and the final 168 features
-to rhythm. The distribution of the features resembled in most cases a gaussian
+to rhythm. The distribution of the features resembled in most cases a Gaussian
 distribution or a skew symmetric distribution. This is illustrated figures
 \ref{fig:feature_distribution}a and \ref{fig:feature_distribution}b.
 \begin{figure}[!t]
@@ -122,21 +125,21 @@ distribution or a skew symmetric distribution. This is illustrated figures
     \includegraphics[width=\textwidth]{feature_skew_symmetric.eps}
     \caption{}
   \end{subfigure}\\
-  \caption{Visualization of typical distributions of features, gaussian distribution (a) and skew-symmetric distribution (b).}
+  \caption{Visualization of typical distributions of features, Gaussian distribution (a) and skew-symmetric distribution (b).}
   \label{fig:feature_distribution}
 \end{figure}
 
 \subsection{Computational methods}
 \label{sec:computational_methods}
 In this work two different methods were used to classify the songs to different
-genres. First method is the gradient descent method in which the logistic-loss
+genres. First method is logistic-regression method in which the logistic-loss
 is minimized iteratively using the gradient descent method.
 The other method used is the Bayes-classifier which classifies the song to
-certain gategory that gives the maximum posterior probability with respect to
+certain category that gives the maximum posterior probability with respect to
 label $i$. Both methods are described below in detail. In addition we studied
 the effect of feature extraction and for that purpose we used principal
-component analysis method to exlude features with little impact. 
-\subsubsection{Gradient descent method}
+component analysis method to exclude features with little impact. 
+\subsubsection{Logistic-regression}
 \label{sec:gradient_descent}
 In logistic regression for binary classifier problem the starting point is the
 minimization of the loss function
@@ -154,7 +157,7 @@ song belongs to certain category or not. The minimization problem can be further
   \label{eq:logreg1}
 \end{eqnarray}
 where $p_{y^i=1}$ is the probability that the song $i$ is labeled belonging to certain category.
-There is no closed form solution for equation (\ref{eq:logreg1}) and for that reason some numberical iterative solver must
+There is no closed form solution for equation (\ref{eq:logreg1}) and for that reason some numerical iterative solver must
 be used to find the optimal $\vw$. One of the most popular methods to find the optimal solution is gradient descent (GD) method.
 In GD the weights $\vw$ are updated at each iteration $\mathrm{k+1}$ according to equation
 \begin{equation}
@@ -184,9 +187,13 @@ Now the $\nabla \emperror(w_j^k)$'s can be written in vector form as
 \end{equation}
 where $\hat{\vy} = \mathrm{max}(\mathbf{0},\vy)$ is a vector of length $N$ for which the
 $i$-th element is zero if $y_i=-1$ and one if $y_i$ = 1. The matrix $X$ is a
-matrix which rows are the feature vectors $\vx^i$. Thus we can solve the minimization
-problem (\ref{eq:logreg2}) iteratively using the GD method (\ref{eq:gd}) and the gradients (\ref{eq:gd_gradients}).
-\subsubsection{Bayes classifer}
+matrix which rows are the feature vectors $\vx^i$. Thus we can solve the
+minimization problem (\ref{eq:logreg2}) iteratively using the GD
+method (\ref{eq:gd}) and the gradients (\ref{eq:gd_gradients}).
+The parameters $\vw$ are solved for each class $i$ using the training data. The
+category $i$ of a song in test-set is then the one with the largest probability
+$p(y_i)$.
+\subsubsection{Bayes classifier}
 \label{sec:bayes_classifier}
 For a Bayes classifier we assume that the distribution of the feature vector of
 a music signal with respect to label $y_i$ is a Gaussian distribution
@@ -204,7 +211,7 @@ where the $p(\vx)$ is a normalization constant and can be omitted. To be able to
 use the equation (\ref{eq:bayes_posterior}) we need to find optimal values for
 parameters $p(y_i)$, $\vm_i$ and $\mathbf{C}_i$. The prior $p(y_i)$ can be
 simply estimated as the fraction of labels $y_i$ among all labels.
-Because the samples ${\vx^{(t)}, y^{(t)}}$ are independent the parameters
+Because the samples ${\vx_i^{(t)}, y_i^{(t)}}$ are independent the parameters
 $\vm_i$ and $\mathbf{C}_i$ and can be obtained by
 maximizing the respective log-likelihood function with respect to the
 parameters. The log-likelihood
@@ -230,7 +237,7 @@ $\mathbf{C}_i$ is obtained  by setting the derivative of $\mathcal{L}_{y=i}$ wit
 \end{eqnarray}
 Setting eq. (\ref{eq:bayes_cs}) to zero and solving for $\mathbf{C}_i$ gives
 $\mathbf{C}_i=\frac{1}{N}\sum_{y^t=i}(\vx^t-\vm_i)(\vx^t-\vm_i)^T$. In equations
-(\ref{eq:bayes_ms}) and (\ref{eq:bayes_cs}) the identieties
+(\ref{eq:bayes_ms}) and (\ref{eq:bayes_cs}) the identities
 $\frac{\partial(\vx-\vs)^T\mathbf{W}(\vx-\vs)}{\partial\vs} = 2\mathbf{W}(\vx-\vs)$, $\frac{\partial\mathrm{ln}|\mathrm{det}(\mathbf{X})|}{\partial\mathbf{X}}=(\mathbf{X}^T)^{-1}$ and  $\frac{\partial\mathbf{a}^T\mathbf{X}^{-1}\vb}{\partial\mathbf{X}}=-\mathbf{X}^{-T}\mathbf{a}\vb^T\mathbf{X}^{-T}$ from matrix cook-book
 \cite{matrixcookbook}
 were used. In classification the parameters $p(y_i)$, $\vm_i$ and $\mathbf{C}_i$
@@ -265,426 +272,108 @@ Comparing equation (\ref{eq:c_svd}) to (\ref{eq:c_diagonalization}) shows that
 the principal axes are the same as the right singular vectors of $\mathbf{X}$.
 Now the principal components of $\mathbf{X}$ are obtained as
 $\mathbf{X}\mathbf{V}=\mathbf{U}\mathbf{S}$. Now we can include only feature
-vectors that have impact by exluding components that corresponds to singular
+vectors that have impact by excluding components that corresponds to singular
 values below some threshold. In this work we included singular values of which
-sum contained 90\% of the total sum of the singular values and exluded rest.
+sum contained 90\% of the total sum of the singular values and excluded rest.
 \section{Results}
 \label{sec:results}
-\begin{figure}[!t]
-  \centering
-  \includegraphics[width=0.42\textwidth]{Ga_256As_255N.eps}
-  \caption{(Color online) Band structure of the periodic Ga$_{256}$As$_{255}$N 
-system. The energy zero coincides with the top of the valence band. The
-vertical lines are guide to an eye and indicates the position of the 
-high-symmetry points.}
-  \label{fig:band_structure}
-\end{figure} 
-
-SC-DFT calculations model alloys through band structures corresponding to 
-the superlattice periodicity. Although this is an artificial approach for a
-random alloy it gives valuable first-principles information about
-the N-host  and N-N interactions. Figure \ref{fig:band_structure} shows
-the band structure of the periodic Ga$_{256}$As$_{255}$N system
-in the small first Brillouin zone corresponding to the large unit cell of 512
-atoms. The lowest conduction band, {\it i.e.}, the CBE is 
-flat outside the central region and bends down when approaching the
-$\Gamma$ point. The flat region is due to the localized nitrogen-induced 
-resonant states that hybridizes especially near the $\Gamma$ point with GaAs 
-bulk states. Anticipating our discussion below the strong dispersion near the 
-$\Gamma$ point can also be interpreted to originate from long-range 
-nitrogen-induced resonant states interacting with each other.
-
-
-The nitrogen-induced states result in characteristic features in the
-LDOS's. Fig. \ref{fig:ldos}a shows the LDOS's
-for Ga$_{256}$As$_{255}$N, Ga$_{108}$As$_{106}$N and Ga$_{32}$As$_{31}$N systems. 
-LDOS's have a narrow peak and a low intensity tail
-toward lower energies corresponding to the flat and dispersive regions
-of the CBE, see Fig. 1, respectively. We find these features also in the case 
-of GaP$_{1-x}$N$_x$ as is evident in Fig. \ref{fig:ldos}b for 
-Ga$_{256}$P$_{255}$N, Ga$_{108}$P$_{107}$N and Ga$_{32}$P$_{31}$N systems. 
-In comparison with GaAs host the LDOS peak related to nitrogen-induced states 
-in GaP is at the same N concentrations lower in energy with respect to the 
-CBM and the extent of the LDOS tail
-is clearly smaller.  When the size of the SC is reduced from 512
-to 216 and further to 64 atoms the peak corresponding to nitrogen-induced 
-states broadens in both alloys but stays stationary 
-with respect to the top of the valence band and the LDOS tail reaches deeper 
-in to the band gap causing its reduction. This behavior is in a good qualitative
-agreement with the behavior of the A line in photoluminescence spectra for 
-GaP$_{1-x}$N$_x$ alloys with increasing N concentration.\cite{yaguchi}
-
-The reduction of the band gap and the length of the LDOS tail below the peak
-corresponding to nitrogen-induced states for the GaAs and GaP SC's with a 
-single N atom 
-and of different sizes are given in Table \ref{tab:concentrations}. For GaP the
-band gap reduction is in practice the same as the length of the LDOS tail 
-reflecting the position of the nitrogen-induced states just at 
-the bulk CBM at the $\Gamma$-point. In the case of GaAs
-a bias of about 0.5 - 0.6 eV should be subtracted from the length of the LDOS 
-tail to obtain the band gap reduction. The bias is due to the location of the 
-peak corresponding to nitrogen-induced resonant states within the bulk 
-conduction band. The lengthening of the LDOS tail 
-causing the band gap reduction is a common feature for the GaAs$_{1-x}$N$_x$ and 
-GaP$_{1-x}$N$_x$ systems calling for a uniform picture for these materials.
-
+Both the logistic-regression classifier and the Bayes classifier where trained
+using the training data set. After that the trained classifiers were applied to
+test data set and the accuracy and the logarithmic-loss of the classifiers were
+evaluated. In addition to test data set an external feature set with unknown
+labels were classified and the accuracy and the logarithmic-loss of classifiers
+were evaluated on an external server and results were compared to those obtained
+from the used test data set. The accuracy of the classifier was simply evaluated
+as the fraction of correct labels with respect to the total number of labels
+$accuracy = \frac{|y_{true}=y_{predicted}|}{N}$. The logarithmic loss was
+evaluated as $log-loss = 1/N\sum_{i=1}^N\sum_{j=1}^My_{ij}log(p_{ij})$ where
+$y_{ij}$ is and indicator function evaluated to 1 if sample $i$ was labeled to
+class $j$ and zero otherwise and the $p_{ij}$ is the corresponding class
+probability. The use logarithm  is the base 10 logarithm.
+\subsection{Logistic-regression}
+\label{sec:result_logistic_regression}
+The accuracy obtained using the logistic-regression and all elements of the
+feature vectors was 0.66 and the corresponding logarithmic-loss was 0.27. The
+accuracy and the logarithmic loss evaluated on the external server were 0.65 and
+0.178 respectively. We also tested to use principal-component analysis to reduce
+the number of features. The corresponding accuracy and logarithmic-loss were
+0.64 and 0.30 respectively being somewhat worse than without feature
+extraction. However it is good to notice that with feature extraction the
+computation was significantly faster. In table \ref{tab:confusion_log_reg} the
+confusion matrix corresponding to full feature vector classification is shown.
 \begin{center}
-  \begin{table}[t]
-    \caption{Band gap reductions and LDOS tail lengths (See Fig. 2) 
-    for different periodic GaAs$_{1-x}$N$_x$ and GaP$_{1-x}$N$_x$ systems. The
-band gap reduction is determined at the $\Gamma$ point of the superlattice.}
-    \begin{tabular*}{0.45\textwidth}{@{\extracolsep{\fill}}lcc}
+  \begin{table}
+    \caption{Confusion matrix corresponding to classification obtained using
+      logistic regression. The column direction indicates the true value and
+      the row direction is the predicted value.  The labels $1\ldots10$ are
+      the ten music genres specified in section \ref{sec:used_data_set}.}
+    \begin{tabular*}{0.45\textwidth}{@{\extracolsep{\fill}}c|cccccccccc}
+        & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10\\
       \hline
-      \hline
-      System SC  & $\Delta E_g$ (eV) & Tail length (eV)\\
-      \hline
-      Ga$_{256}$As$_{255}$N & 0.02 & 0.53\\ 
-      Ga$_{108}$As$_{107}$N & 0.09 & 0.67\\
-      Ga$_{32}$As$_{31}$N & 0.34 & 0.99\\
-      \hline
-      Ga$_{256}$P$_{255}$N & 0.13 & 0.13\\
-      Ga$_{108}$P$_{107}$N & 0.22 & 0.21\\
-      Ga$_{32}$P$_{31}$N & 0.57 & 0.56\\
-      \hline
-      \hline
-    \end{tabular*}
-    \label{tab:concentrations}
-  \end{table}
-\end{center}
-Figure \ref{fig:cbe_3D} shows the CBE partial charge density in GaAs
-around a N atom as a density isosurface. In GaP we find a similar
-behavior. The partial charge density is  
-obtained by summing the densities from all the k-points used in the calculation.
-The SC used contains 512 atoms and the isosurface is viewed along a 
-$\langle$111$\rangle$ direction 
-so that
-\begin{figure}[!b]
-  \centering
-    \includegraphics[width=0.36\textwidth]{cbe_3D.eps}
-    \caption{(Color online). CBE partial charge density in the
-Ga$_{256}$As$_{255}$N SC, viewed along the $\langle$111$\rangle$
-direction. The isosurface shown corresponds to a density isovalue of 0.0012.
-The N atom is located at the center of the figure.}
-  \label{fig:cbe_3D}
-\end{figure}a Ga atom is on top of the N atom in the  center of the figure.
-The density agglomerates strongly around the N atom and stretches
-out toward the four nearest-neighbor Ga atoms and the N-Ga back bonds. 
-Thereafter, the agglomeration of the CBE partial charge density is directed
-toward the 12 zigzag directions (six of them are on a \{111\} plane 
-perpendicular
-to the direction of view, three of them point upwards and three downwards
-from that \{111\} plane). We have checked that the CBE partial density from 
-all the k-points, including those with dispersion and near 
-the $\Gamma$ point, have this anisotropic character. The interaction 
-between the nitrogen-induced states takes place along the the zigzag 
-chains
-with  the CBE partial charge agglomeration. Thus, when the N concentration 
-increases both the width of the narrow LDOS peak and the extent of the
-LDOS tail increase simultaneously with the strengthening of the CBE 
-partial charge agglomeration on the connecting zigzag chains.
-
-The tendency of the CBE charge to localize along the zigzag chains
-is strongly connected with ionic relaxations, initiated by the strong and short 
-Ga-N bonds also propagating along these chains. According to our SC-DFT
-calculations the Ga-N bond attains in GaAs and GaP nearly the same value as in 
-bulk GaN resulting in an inward relaxation of the nearest neighbor Ga  atoms by 
-13-16 \% of the bond length of the GaAs and GaP lattices. A similar strong
-ionic relaxation along the zigzag directions has been previously observed
-in the case of the vacancy in silicon \cite{wang_cz} and a
-similar anisotropy of localized N derived states in GaAs and GaP was
-predicted by Kent and Zunger.\cite{zunger1} We can see the
-agglomeration of the CBE partial charge density also when we omit the 
-ionic relaxation from ideal lattice
-positions but then the effect is clearly weaker and shorter in range. This 
-is  in agreement with Kent and Zunger \cite{zunger1} who
-predicted a  stronger band gap reduction when the ionic structures were relaxed 
-in SC  calculations.
-\begin{center}
-  \begin{table}[!t]
-    \caption{Band gap reduction due to a single N atom or two N atoms
-      in the 512- and 216-atom  GaAs SC's. Three different
-      configurations are considered for two N atoms.}
-    \begin{tabular*}{0.4\textwidth}{@{\extracolsep{\fill}}lc}
-      \hline \hline Configuration & $\Delta E_g$ (eV)
-      \\ \hline 
-         Ga$_{256}$As$_{255}$N                  & 0.02
-      \\ Ga$_{256}$As$_{254}$N$_2$ [(1,1,0)$a$] & 0.09
-      \\ Ga$_{256}$As$_{254}$N$_2$ [(1,1,1)$a$] & 0.06
-      \\ Ga$_{256}$As$_{254}$N$_2$ [(1,0,0)$a$] & 0.04
-      \\ Ga$_{108}$As$_{107}$N                  & 0.09
-      \\ Ga$_{108}$As$_{106}$N$_2$ [(1,1,0)$a$] & 0.20
-      \\ Ga$_{108}$As$_{106}$N$_2$ [(1,1,1)$a$] & 0.17
-      \\ Ga$_{108}$As$_{106}$N$_2$ [(1,0,0)$a$] & 0.12 
-      \\ Ga$_{32}$As$_{31}$N                   & 0.34
-      \\ \hline
-      \hline
-    \end{tabular*}
-    \label{tab:configurations}
+      1 & 652 & 35 & 7 & 9 & 4 & 10 & 1 & 3 & 2 & 3\\
+      2 & 57 & 130 & 9 & 4 & 2 & 1 & 0 & 2 & 2 & 0\\
+      3 & 14 & 9 & 82 & 4 & 2 & 1 & 0 & 0 & 1 & 0 \\
+      4 & 25 & 3 & 0 & 43 & 0 & 2 & 0 & 1 & 0 & 2 \\
+      5 & 38 & 4 & 1 & 5 & 11 & 1 & 1 & 0 & 3 & 0 \\
+      6 & 37 & 6 & 12 & 8 & 4 & 25 & 0 & 0 & 0 & 0 \\
+      7 & 34 & 6 & 1 & 2 & 2 & 4 & 3 & 1 & 0 & 0 \\
+      8 & 50 & 0 & 0 & 1 & 2 & 1 & 0 & 9 & 0 & 0 \\
+      9 & 2 & 5 & 0 & 2 & 1 & 0 & 0 & 8 & 0 & 27 \\
+      10 & 21 & 0 & 0 & 6 & 1 & 2 & 0 & 1 & 0 & 3\\
+      \end{tabular*}
+    \label{tab:confusion_log_reg}
   \end{table}
 \end{center}
 
-We have studied the anisotropy and strength of the N-N interaction
-also by inserting two N atoms at different positions in GaAs
-SC's of 216 and 512 atoms. The studied representative
-configurations contain one N atom in the origin and another
-one in the (1,1,1)$a$, (1,1,0)$a$, or (1,0,0)$a$ location, where $a$
-is the lattice parameter of the conventional unit cell. The results are given
-in Table \ref{tab:configurations} in terms of the reduction of the band gap with
-respect to the GaAs bulk band gap. The behavior of the band gap is
-qualitatively similar for the two SC sizes signalizing
-from the interaction between the N atoms inside the same SC.
-The strongest reduction in the band gap is observed for the (1,1,0)$a$
-configuration in accordance with the above discussion about the
-anisotropy of the nitrogen-induced resonant states.
-In the (1,0,0)$a$ configuration the N atoms are not along the same
-zigzag chain and consistently the band gap reduction is modest compared to the
-case of a single N atom in the SC. In the (1,1,1)$a$ configuration the band gap
-reduction is intermediate between those of the (1,1,0)$a$ and (1,0,0)$a$
-configurations. This  is due to the fact that the strong back bond at a
-Ga atom caused by one of  the N atoms is next to the other N atom.
-
-In order to study the effect of the interactions between the nitrogen-induced 
-states on the band gap reduction in random structures in accordance 
-with the
-experimental conditions we have developed on the basis of our \textit{ab initio}
-results a TB model, in which only interactions between N atom sites
-connected through zigzag chains are included. In our model the non-diagonal
-matrix elements $h_{i,j}$, describing the interaction between the N atom sites
-$i$ and $j$, are defined as $h_{i,j}=k/r_{i,j}^{\alpha}$ if the sites are connected 
-through a zigzag chain and $h_{i,j} = 0$ otherwise. Here $r_{i,j}$ is the distance
-between the two N atoms. The power-law decay reflects the long-range tendency of
-the directional interaction. The diagonal terms $h_{i,i}$ are set to a 
-constant value describing the energy level of the nitrogen-induced states. 
-To determine the
-parameters $k$ and $\alpha$ we used our LDOS results calculated within the 
-SC-DFT scheme for four large 
-structures of a single N atom in the SC's of 64-, 216-, 512-atoms 
-(Fig. \ref{fig:ldos}) and of two N 
-atoms at the nearest anion sites in the 216-atom SC 
-(Fig. \ref{fig:ldos_N2_near}). The parameter values of
-$k=-0.67$ eV\r{A}$^\alpha$, $\alpha=1.28$ reproduce
-the DFT LDOS peak and tail structures (See Fig. \ref{fig:ldos}) of N in GaAs
-and $k=-0.59$ eV\r{A}$^\alpha$, $\alpha=1.43$ those of N in GaP. The 
-implementation of the developed method is explained in more detail in 
-Appendix \ref{appendix}.
-\begin{figure}[!b]
-  \centering
-  \includegraphics[width=0.42\textwidth]{ldos_plots_N2_near.eps}
-  \caption{(Color online) First-principles LDOS's corresponding to two N atoms
-at neighboring anion sites in Ga$_{108}$As$_{106}$N$_2$ and
-Ga$_{108}$P$_{106}$N$_2$ systems. The solid segments indicate the distance between
-the two peaks related to nitrogen-induced states and the distance between the 
-center of mass of the two peaks and the minimum eigenvalue. The energy zero 
-coincides with the top of the valence band.}
-  \label{fig:ldos_N2_near}
-\end{figure}
-
-Using our \textit{ab initio} -based TB model we study changes 
-in the CBE as a function of the N concentration. We randomly distribute from 
-384 up to 13,824 N atoms into a SC of 442,368 anion sites. The resulting 
-Hamiltonian matrix is diagonalized
-and a broadening eigenvalue distribution around the original energy level of
-nitrogen-induced states is obtained. Between the extreme values there exists a 
-distribution of eigenvalues
-corresponding to the continuous broadening of the nitrogen-induced states seen
-in the 
-LDOS's. Fig. \ref{fig:random_dist}  shows as an example the distribution for a
-large GaAs$_{1-x}$N$_x$ sample with a N concentration of 3.1\%. The highest peak
-is due to the isolated N atoms and the two lower ones are related to N-N pairs.
-These features are in agreement with the measured scanning tunneling spectra
-.\cite{ivanova}
-\begin{figure}[!t]
-  \centering
-  \includegraphics[width=0.42\textwidth]{random_dist.eps}
-  \caption{(Color online) TB eigenvalue distribution 
-corresponding to a random sample of 13,824 N atoms (3.1\% concentration)
-in the GaAs$_{1-x}$N$_x$ alloy.}
-  \label{fig:random_dist}
-\end{figure} 
-
-\begin{figure}[!t]
-  \centering
-  \begin{subfigure}[]{0.38\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{conc_dep_GaAs.eps}
-    \caption{}
-  \end{subfigure}\\
-  \vspace{0.2cm}
-  \centering
-  \begin{subfigure}[]{0.38\textwidth}
-    \centering
-    \includegraphics[width=\textwidth]{conc_dep_GaP.eps}
-    \caption{}
-  \end{subfigure}
-  \caption{(Color online) Broadening of the distribution of nitrogen-induced 
-states as a function of N concentration in (a) GaAs$_{1-x}$N$_x$  and (b) 
-GaP$_{1-x}$N$_x$. Blue circles and 
-squares give our random-system TB and SC-DFT results, respectively. For 
-GaAs$_{1-x}$N$_x$ red triangles are experimental data from Ref. 
-\onlinecite{klar} (measurement temperature 300  K), whereas for  
-GaP$_{1-x}$N$_x$  red upright and downright triangles  are experimental data 
-from Refs. \onlinecite{yaguchi} (20 K) and \onlinecite{shan2} 
-(room temperature),
-respectively. The energy zero is the energy level corresponding to isolated
-nitrogen-induced states (In calculations the position of the peak corresponding
-to nitrogen-induced states in LDOS). To align the experimental and calculated 
-energy levels corresponding to nitrogen-induced states in GaAs$_{1-x}$N$_x$ the 
-experimental data is shifted to locate symmetrically with respect to the energy 
-zero.}
-\label{fig:splitting}
-\end{figure} 
-We plot, respectively, in Figs. \ref{fig:splitting}a and 
-\ref{fig:splitting}b for GaAs$_{1-x}$N$_x$ and GaP$_{1-x}$N$_x$ for each
-N concentration the minimum and maximum values of the eigenvalue distribution.
-The values are averaged over 100 different random samples. 
-The extreme values show a square root like behavior, which is, in the case 
-GaAs$_{1-x}$N$_x$, in a good agreement with photomodulated reflectance 
-measurements for the N-induced band gap reduction and a N-induced feature in the
-conduction band.\cite{klar} Similarly, for GaP$_{1-x}$N$_x$  our results are in 
-good agreement with the band gap reduction measured by 
-photoluminescence\cite{yaguchi} and photomodulated transmission 
-spectroscopy.\cite{shan2} Our 
-present SC-DFT results shown in Fig. 4 as well earlier SC-DFT
-calculations\cite{zunger1,virkkala} give a linear dependence of the band gap 
-reduction on the N concentration which is in a clear disagreement with 
-experimental findings. The reason for the linear dependence is the fact that N 
-atoms of the neighboring SC's are on the same zigzag chains resulting in a 
-surplus of N-N interactions with relatively short distances in comparison with
-the random N atom distribution of the same concentration.
-
+\subsection{Bayes classifier}
+\label{sec:result_bayes_classifier}
+For Bayes-classifier the sample covariance matrix $C_i$ defined in section
+\ref{sec:bayes_classifier} becomes singular if all elements in the feature
+vector are used and for that reason classification was only performed alongside
+with the feature extraction. In feature extraction we selected features
+corresponding to singular values that counted 80\% of the total sum of
+singular values and excluded rest. The obtained accuracy was 0.53 and the
+corresponding logarithmic-loss was 0.33. The accuracy and the logarithmic loss
+evaluated on the external server were 0.32 and 1.17 respectively significantly
+lower performance than with the test data. In table \ref{tab:confusion_bayes}
+the confusion matrix corresponding to Bayes-classifier classification is shown.
+\begin{center}
+  \begin{table}[b]
+    \caption{Confusion matrix corresponding to classification obtained using
+      Bayes-classifier. The column direction indicates the true value and the
+      row direction is the predicted value. The labels $1\ldots10$ are the ten
+    music genres specified in section \ref{sec:used_data_set}.}
+    \begin{tabular*}{0.45\textwidth}{@{\extracolsep{\fill}}c|cccccccccc}
+        & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10\\
+      \hline
+      1 & 544 & 172 & 0 & 7 & 0 & 2 & 0 & 1 & 0 & 0\\
+      2 & 27 & 174 & 3 & 2 & 0 & 0 & 0 & 1 & 0 & 0\\
+      3 & 9 & 53 & 51 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+      4 & 20 & 48 & 0 & 6 & 0 & 1 & 0 & 1 & 0 & 0 \\
+      5 & 31 & 32 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 \\
+      6 & 28 & 57 & 5 & 0 & 0 & 2 & 0 & 0 & 0 & 0 \\
+      7 & 21 & 31 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+      8 & 53 & 8 & 0 & 1 & 0 & 0 & 0 & 1 & 0 & 0 \\
+      9 & 6 & 18 & 3 & 0 & 0 & 0 & 0 & 0 & 0 & 27 \\
+      10 & 15 & 18 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+      \end{tabular*}
+    \label{tab:confusion_bayes}
+  \end{table}
+\end{center}
 \section{Conclusions}
 \label{sec:conclusions}
-In this work we demonstrated using \textit{ab initio} calculations 
-how the nitrogen-induced states near the CBM propagate along zigzag chains in 
-GaAs$_{1-x}$N$_x$ and GaP$_{1-x}$N$_x$ alloys. This results in coupling between
-states originating from different N atoms which becomes stronger with 
-increasing N concentration leading to the broadening of the distribution of 
-nitrogen-induced states. On the basis of our DFT results we constructed a TB 
-model for the interaction of the nitrogen-induced 
-states and applied it in large random
-systems of N atoms in GaAs and GaP. The model predicts a square-root-like
-broadening of the distributions of nitrogen-induced states as a 
-function of the N 
-concentration and a corresponding narrowing of the band gap in agreement with
-experiments. The square-root-like behavior is due to the interplay between the
-directional and long-range characters of the interactions between the 
-nitrogen-induced states. Thus, the band gap 
-narrowing in dilute III-V nitrides can be qualitatively and quantitatively 
-explained by \textit{ab initio} calculations, and it is an 
-inherent property of the interactions between nitrogen-induced states 
-mediated by the host lattice, rather than nitrogen host material CBE
-interaction.
-
-\section{Acknowledgments}
-We acknowledge the Suomen Kulttuurirahasto foundation
-for financial support. This work has been supported by
-the Academy of Finland through the Center of Excellence program. 
-The computer time was provided by CSC -- the Finnish IT Center
-for Science.
-
-\appendix*
-\section{Developed TB model}
-\label{appendix}
-We have developed a TB model describing the interaction between
-nitrogen-induced states originating from N atoms substituting anions 
-in a III-V compound semiconductors. The non-diagonal matrix elements 
-$h_{i,j}$ corresponding to the N atoms $i$ and $j$, are 
-defined as $h_{i,j}=k/r_{i,j}^{\alpha}$ if atoms $i$ and $j$, separated by the 
-distance $r_{i,j}$, are connected trough a zigzag chain and $h_{i,j}=0$ otherwise.
-The diagonal terms are set to an arbitrary chosen 
-constant value $E_{s^*}$ describing the energy level of the isolated 
-nitrogen-induced 
-states. The units are electron volts and angstroms. Using the supercell 
-approximation with periodic boundary conditions and the $\Gamma$-point 
-approximation the non-zero matrix elements $h_{i,j}$ become
-\begin{equation}
-  h_{i,j}=\sum_{\mathbf{L}}\frac{k}{\left|\mathbf{\hat{r}}_{i,j}+\mathbf{L}\right|^{\alpha}},
-\label{eq:periodic1}
-\end{equation}
-where $\mathbf{L}$ is a vector of the superlattice. The restriction on the 
-interactions to the zigzag chains  and the use of simple-cubic supercells
-modifies Eq. \ref{eq:periodic1} to the form,
-\begin{equation}
-  h_{i,j}=\sum_{\phi}\sum_{n=0}^{\infty}\frac{k}{\left(r_{i,j_{\phi}}+\sqrt{2}nL\right)^{\alpha}},
-\label{eq:periodic2}
-\end{equation}
-where $\phi$ runs over all directions where the N atoms $i$ and $j$ are 
-connected through a zigzag chain and $L$ is the side length of the cubic 
-supercell. The diagonal 
-terms become
-\begin{equation}
-  h_{i,i}=E_{s^*}+12\sum_{n=1}^{\infty}\frac{k}{\left(\sqrt{2}nL\right)^{\alpha}}.
-\label{eq:diagonal}
-\end{equation}
-The inner sum in Eq.
-\ref{eq:periodic2} is the Hurwitz zeta function and it can be evaluated
-efficiently using the Euler-Maclaurin summation formula\cite{press}. 
-
-To determine
-the free parameters $k$ and $\alpha$, we created large ordered structures
-corresponding to single N atom in 64-, 216-, 512-atoms supercells and two N 
-atoms at the neighboring anion sites in the 216-atom supercell and fitted the 
-parameters $k$ and $\alpha$ so that the TB eigenvalue distribution reproduces 
-the characteristic features in our first-principles LDOS results shown in Figs.
-\ref{fig:ldos}a-\ref{fig:ldos}b and \ref{fig:ldos_N2_near}. 
-In the case of a single N atom the
-fitted feature is the tail length and in the case of two N atoms the fitted
-features are both the distance between the peaks corresponding to the bonding
-and antibonding wave functions and the distance between their center of mass
-and the conduction band minimum.
-The optimal $k$ and $\alpha$ are found by searching for each value of 
-$\alpha$ the optimal $k$ value  in the least squares sense.
-The obtained parameters are $k=-0.67$ eV\r{A}$^\alpha$, $\alpha=1.28$ 
-(GaAs$_{1-x}$N$_x$) and $k=-0.59$ eV\r{A}$^\alpha$, $\alpha=1.43$ 
-(GaP$_{1-x}$N$_x$).
-
-In the case of GaAs we checked the possibility that the N-N interactions are
-not restricted to the zigzag chains and modelled them using the short-range
-exponential decay. However, this model does not reproduce
-the DFT results in Figs. \ref{fig:ldos}a-\ref{fig:ldos}b and 
-\ref{fig:ldos_N2_near} and the error in the fit becomes nearly four times 
-larger than in the case where the interaction are restricted on the zig-zag 
-chains.
-
-To simulate real structures, we distributed randomly from 384 up to 13,824 N 
-atoms into a supercell of 442,368 anion sites. The resulting Hamiltonian matrix 
-is diagonalized and a broadening eigenvalue distribution around the original 
-energy level of nitrogen-induced states is obtained. 
-Fig. \ref{fig:random_dist} shows the obtained 
-distribution in the case of 13,824 N atoms. The side peaks around the 
-nitrogen-induced peak results from the N pairs located at the 
-neighboring anion sites.
-%begin{figure*}[!t]
-%  \centering
-%    \subfloat[]{\epsfig{file=ldos_plots_GaAs.eps,width=0.4\linewidth,clip=}}
-%    \hspace{1cm}
-%    \subfloat[]{\epsfig{file=ldos_plots_GaP.eps,width=0.4\linewidth,clip=}}\\
-%    \subfloat[]{\epsfig{file=ldos_plots_N2_near.eps,width=0.4\linewidth,clip=}}
-%    \hspace{1cm}
-%    \subfloat[]{\epsfig{file=opt_curves.eps,width=0.4\linewidth,clip=}}\\
-%    \caption{(Color online) First-principles LDOS's at a N atom in 
-%GaAs$_{1-x}$N$_x$ and GaP$_{1-x}$N$_x$ supercells (a)-(c) and least square error 
-%in the fit as a function of the $\alpha$ parameter (d). In the case of a single 
-%N atom in the supercell the solid 
-%segment indicates the distance between the localized N 2$s$ state and the 
-%conduction band minimum. In the case of a N pair the solid segments indicate
-%the distance between the two N 2$s$ related peaks and the distance between the
-%center of mass of the two peaks and the minimum eigenvalue. The energy zero
-%coincides with the top of the valence band.}
-%  \label{fig:ldos_supp}
-%\end{figure*}
-%\begin{figure*}[h]
-%  \centering
-%    \subfloat[]{\epsfig{file=dist_N2_near.eps,width=0.4\linewidth,clip=}}
-%    \hspace{1cm}
-%    \subfloat[]{\epsfig{file=random_dist.eps,width=0.4\linewidth,clip=}}\\
-%    \caption{(Color online) TB eigenvalue distribution 
-%(smoothed using a moving average) in the case of two N atoms in the 
-%neighboring anion sites in the periodic GaAs$_{1-x}$N$_x$ structure (a) and TB
-%eigenvalue distribution corresponding to a random sample of 13,824 N
-%atoms in the GaAs$_{1-x}$N$_x$ alloy.}
-%  \label{fig:simulations}
-%\end{figure*}
+In this work we used logistic-regression and Bayes-classifier to classify songs
+to different genres based on the music signal's characteristics. For logistic
+regression the obtained accuracy for test set was 0.67 and logistic-loss 0.27.
+For the external data set used the obtained accuracy and logistic-loss were 0.65
+and 0.178 respectively in the case of logistic-regression. For the
+Bayes-classifier the obtained accuracy and logistic-loss were 0.53 and 0.33 for
+the test-data and for external data set 0.32 and 1.17 respectively. According to
+obtained results both classifiers performed clearly better than random guess,
+but remained far from perfect classification. From the two classifiers used
+the logistic-regression classifier performed clearly better. The logistic
+classifier also generalized much better to completely new data giving nearly
+equal performance for test data set and external data set.
 
 \bibliography{references}
 
